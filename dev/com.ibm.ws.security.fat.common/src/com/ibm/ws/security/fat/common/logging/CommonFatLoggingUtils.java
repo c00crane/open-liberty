@@ -1,3 +1,13 @@
+/*******************************************************************************
+ * Copyright (c) 2018, 2020 IBM Corporation and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ * IBM Corporation - initial API and implementation
+ *******************************************************************************/
 package com.ibm.ws.security.fat.common.logging;
 
 import java.net.HttpURLConnection;
@@ -240,7 +250,7 @@ public class CommonFatLoggingUtils {
         Log.info(thisClass, thisMethod, topAndBottomDelimiter);
     }
 
-    void printExpectationData(Expectation expectation) {
+    public void printExpectationData(Expectation expectation) {
         String thisMethod = "logExpectationData";
         if (isExpectationForSuccessfulStatusCode(expectation)) {
             Log.info(thisClass, "printExpectations", "  Action: " + expectation.getAction() + " (expect 200 response)");

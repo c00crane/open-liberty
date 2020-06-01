@@ -226,6 +226,7 @@ public class TestActions {
         loggingUtils.printRequestParts(wc, request, currentTest);
         try {
             Page response = wc.getPage(request);
+            loggingUtils.printAllCookies(wc);
             loggingUtils.printResponseParts(response, currentTest, "Response from URL: ");
             return response;
         } catch (Exception e) {

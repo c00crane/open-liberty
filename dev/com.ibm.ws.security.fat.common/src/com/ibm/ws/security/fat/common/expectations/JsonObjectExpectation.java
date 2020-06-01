@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2018 IBM Corporation and others.
+ * Copyright (c) 2018, 2020 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -37,7 +37,7 @@ public class JsonObjectExpectation extends Expectation {
 
     protected static Class<?> thisClass = JsonObjectExpectation.class;
 
-    static final String DEFAULT_FAILURE_MSG = "An error occurred validating JSON data.";
+    public static final String DEFAULT_FAILURE_MSG = "An error occurred validating JSON data.";
 
     List<ValueType> jsonPrimitiveTypes = Arrays.asList(new ValueType[] { ValueType.NULL, ValueType.TRUE, ValueType.FALSE });
 
@@ -85,7 +85,7 @@ public class JsonObjectExpectation extends Expectation {
     }
 
     @Override
-    protected void validate(Object contentToValidate) throws Exception {
+    public void validate(Object contentToValidate) throws Exception {
         try {
             JsonObject jsonDataToValidate = readJsonFromContent(contentToValidate);
             verifyKeyExistenceMatchesExpectation(jsonDataToValidate);

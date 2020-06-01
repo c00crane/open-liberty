@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 IBM Corporation and others.
+ * Copyright (c) 2019, 2020 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -31,28 +31,36 @@ public class JwtTokenHeaderExpectation extends JsonObjectExpectation {
 
     public JwtTokenHeaderExpectation(String expectedKey, CheckType checkType, Object expectedValue) {
         super(expectedKey, checkType, expectedValue);
-        this.searchLocation = SEARCH_LOCATION;
-        this.failureMsg = DEFAULT_FAILURE_MSG;
+        searchLocation = SEARCH_LOCATION;
+        failureMsg = DEFAULT_FAILURE_MSG;
     }
 
     public JwtTokenHeaderExpectation(String expectedKey, ValueType expectedValueType) {
         super(expectedKey, expectedValueType);
-        this.searchLocation = SEARCH_LOCATION;
-        this.failureMsg = DEFAULT_FAILURE_MSG;
+        searchLocation = SEARCH_LOCATION;
+        failureMsg = DEFAULT_FAILURE_MSG;
     }
 
     public JwtTokenHeaderExpectation(String expectedKey, ValueType expectedValueType, Object expectedValue) {
         super(expectedKey, expectedValueType, expectedValue, DEFAULT_FAILURE_MSG);
-        this.searchLocation = SEARCH_LOCATION;
+        searchLocation = SEARCH_LOCATION;
     }
 
     @Override
     protected JsonObject readJsonFromContent(Object contentToValidate) throws Exception {
         String method = "readJsonFromContent - (JwtTokenHeaderExpectation)";
         JsonObject header = null;
+        Log.info(thisClass, method, "received: " + contentToValidate);
         try {
             if (contentToValidate != null && (contentToValidate instanceof String)) {
+                Log.info(thisClass, method, "contentToValidate is non-null string");
                 header = (new JwtTokenForTest((String) contentToValidate)).getJsonHeader();
+            } else {
+                if (contentToValidate == null) {
+                    throw new Exception("Provided content is null so cannot be validated.");
+                } else {
+                    throw new Exception("Provided content is not a String so cannot be validated.");
+                }
             }
             Log.info(thisClass, method, "Header: " + header);
             return header;

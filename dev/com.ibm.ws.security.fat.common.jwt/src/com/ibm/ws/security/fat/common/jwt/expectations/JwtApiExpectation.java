@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 IBM Corporation and others.
+ * Copyright (c) 2019, 2020 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -49,41 +49,46 @@ public class JwtApiExpectation extends ResponseFullExpectation {
         super(null, JwtConstants.STRING_MATCHES, null, "Response from test step  did not match expected value.");
         validationKey = key;
 
-        // based on what we're trying to check, override the validation value and the check type
-        switch (claimType) {
-            case SPECIFIC_CLAIM_API:
-                checkType = JwtConstants.STRING_MATCHES;
-                validationValue = buildClaimApiString(prefix, key, value);
-                break;
-
-            case CLAIM_LIST_MEMBER:
-                if (value == null || value.equals("-1")) {
-                    checkType = JwtConstants.STRING_DOES_NOT_MATCH;
-                } else {
+        if (claimType != null) {
+            // based on what we're trying to check, override the validation value and the check type
+            switch (claimType) {
+                case SPECIFIC_CLAIM_API:
                     checkType = JwtConstants.STRING_MATCHES;
-                }
-                validationValue = buildJsonClaimString(prefix, key, value);
-                break;
+                    validationValue = buildClaimApiString(prefix, key, value);
+                    break;
 
-            case CLAIM_FROM_LIST:
-                if (value == null || value.equals("-1")) {
-                    checkType = JwtConstants.STRING_DOES_NOT_MATCH;
-                } else {
-                    checkType = JwtConstants.STRING_MATCHES;
-                }
-                validationValue = buildJsonAllClaimString(prefix, JwtConstants.JWT_JSON + JwtConstants.JWT_GETALLCLAIMS, key, value);
-                break;
-            case HEADER_CLAIM_FROM_LIST:
-                if (value == null || value.equals("-1")) {
-                    checkType = JwtConstants.STRING_DOES_NOT_MATCH;
-                } else {
-                    checkType = JwtConstants.STRING_MATCHES;
-                }
-                validationValue = buildJsonAllClaimString(prefix, JwtConstants.JWT_TOKEN_HEADER_JSON, key, value);
-                break;
+                case CLAIM_LIST_MEMBER:
+                    if (value == null || value.equals("-1")) {
+                        checkType = JwtConstants.STRING_DOES_NOT_MATCH;
+                    } else {
+                        checkType = JwtConstants.STRING_MATCHES;
+                    }
+                    validationValue = buildJsonClaimString(prefix, key, value);
+                    break;
 
-            default:
-                break;
+                case CLAIM_FROM_LIST:
+                    if (value == null || value.equals("-1")) {
+                        checkType = JwtConstants.STRING_DOES_NOT_MATCH;
+                    } else {
+                        checkType = JwtConstants.STRING_MATCHES;
+                    }
+                    validationValue = buildJsonAllClaimString(prefix, JwtConstants.JWT_JSON + JwtConstants.JWT_GETALLCLAIMS, key, value);
+                    break;
+                case HEADER_CLAIM_FROM_LIST:
+                    if (value == null || value.equals("-1")) {
+                        checkType = JwtConstants.STRING_DOES_NOT_MATCH;
+                    } else {
+                        checkType = JwtConstants.STRING_MATCHES;
+                    }
+                    validationValue = buildJsonAllClaimString(prefix, JwtConstants.JWT_TOKEN_HEADER_JSON, key, value);
+                    break;
+
+                default:
+                    break;
+            }
+        } else {
+            validationValue = "Test setup failure";
+            failureMsg = "claimType passed to JwtApiExpectation was null - only enum values: SPECIFIC_CLAIM_API, CLAIM_LIST_MEMBER, CLAIM_FROM_LIST, HEADER_CLAIM_FROM_LIST are valid";
         }
     }
 
@@ -113,15 +118,8 @@ public class JwtApiExpectation extends ResponseFullExpectation {
 
     public String buildJsonAllClaimString(String prefix, String subPrefix, String key, Object value) {
 
-        String builtString = "garbage";
-        if (value instanceof Long) {
-            if (value.equals(-1L)) {
-                builtString = prefix + subPrefix + ".*" + key + ".*";
-            }
-        }
-        builtString = prefix + subPrefix + ".*" + key + ".*" + value;
+        return prefix + subPrefix + ".*" + key + ".*" + value;
 
-        return builtString;
     }
 
 }
