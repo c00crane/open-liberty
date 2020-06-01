@@ -52,6 +52,7 @@ import com.ibm.wsspi.uow.UOWAction;
 import com.ibm.wsspi.uow.UOWManager;
 
 import componenttest.annotation.ExpectedFFDC;
+import componenttest.annotation.SkipForRepeat;
 import componenttest.app.FATServlet;
 
 @SuppressWarnings("serial")
@@ -101,6 +102,8 @@ public class SimpleServlet extends FATServlet {
     final int fallbackResult = 17;
 
     @Test
+    // TODO: Remove skip when injection is enabled for jakartaee9
+    @SkipForRepeat({ SkipForRepeat.EE9_FEATURES })
     public void testAsyncFallback(HttpServletRequest request, HttpServletResponse response) throws Exception {
         System.out.println("testAsyncFallback: About to call bean.getInt() on thread: " + String.format("%08X", Thread.currentThread().getId()));
 
@@ -116,7 +119,7 @@ public class SimpleServlet extends FATServlet {
     public void testUserTranLookup(HttpServletRequest request, HttpServletResponse response) throws Exception {
         final Object ut = new InitialContext().lookup("java:comp/UserTransaction");
 
-        if (ut instanceof UserTransaction) {
+        if (ut instanceof javax.transaction.UserTransaction) {
             ((UserTransaction) ut).begin();
             ((UserTransaction) ut).commit();
         } else {

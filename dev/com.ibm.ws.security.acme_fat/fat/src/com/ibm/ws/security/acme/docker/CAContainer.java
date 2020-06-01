@@ -52,6 +52,16 @@ public abstract class CAContainer extends GenericContainer<CAContainer> {
 	 * reachable.
 	 */
 	private final int dnsManagementPort;
+	
+	/**
+	 * Number of attemps to start containers again after catch an exception
+	 */
+	protected final static int NUM_RESTART_ATTEMPTS_ON_EXCEPTION = 3;
+	
+	/**
+	 * Value to put into withStartupAttempts on container config
+	 */
+	protected final static int WITH_STARTUP_ATTEMPTS = 20;
 
 	/**
 	 * Instantiate a new {@link CAContainer} instance.
@@ -274,7 +284,7 @@ public abstract class CAContainer extends GenericContainer<CAContainer> {
 	 * @throws IOException
 	 */
 	public void addDnsARecord(String host, String address) throws IOException {
-		final String METHOD_NAME = "addARecord";
+		final String METHOD_NAME = "addDnsARecord";
 
 		try (CloseableHttpClient httpclient = HttpClients.createDefault()) {
 
@@ -317,7 +327,7 @@ public abstract class CAContainer extends GenericContainer<CAContainer> {
 	 * @throws IOException
 	 */
 	public void addDnsAAAARecord(String host, String address) throws IOException {
-		final String METHOD_NAME = "addAAAARecord";
+		final String METHOD_NAME = "addDnsAAAARecord";
 
 		try (CloseableHttpClient httpclient = HttpClients.createDefault()) {
 
@@ -397,7 +407,7 @@ public abstract class CAContainer extends GenericContainer<CAContainer> {
 	 * @throws IOException
 	 */
 	public void clearDnsARecord(String host) throws IOException {
-		final String METHOD_NAME = "clearARecord(String)";
+		final String METHOD_NAME = "clearDnsARecord(String)";
 
 		try (CloseableHttpClient httpclient = HttpClients.createDefault()) {
 			/*
@@ -549,12 +559,12 @@ public abstract class CAContainer extends GenericContainer<CAContainer> {
 	/**
 	 * Get the URI to the ACME CA's directory.
 	 * 
-	 * @param usePebbleURI
+	 * @param useAcmeURI
 	 *            Use the "acme://pebble" style URI instead of the generic
 	 *            "https:" URI. This param is ignored for Boulder.
 	 * @return The URI to the ACME CA's directory.
 	 */
-	public abstract String getAcmeDirectoryURI(boolean usePebbleURI);
+	public abstract String getAcmeDirectoryURI(boolean useAcmeURI);
 
 	/**
 	 * Get the IP address for the container as seen from the container network.
@@ -659,4 +669,29 @@ public abstract class CAContainer extends GenericContainer<CAContainer> {
 			}
 		}
 	}
+
+	/**
+	 * Get the OCSP responder URL for this {@link CAContainer}.
+	 * 
+	 * @return the OCSP responder URL.
+	 * @throws UnsupportedOperationException
+	 *             if the container does not support an OCSP responder.
+	 */
+	public abstract String getOcspResponderUrl();
+	
+	/**
+	 * Start the DNS server for this {@link CAContainer}.
+	 * 
+	 * @throws UnsupportedOperationException
+	 *             if the container does not support starting the a DNS server
+	 */
+	public abstract void startDNSServer();
+
+	/**
+	 * Stop the DNS server for this {@link CAContainer}.
+	 * 
+	 * @throws UnsupportedOperationException
+	 *             if the container does not support stopping the a DNS server
+	 */
+	public abstract void stopDNSServer();
 }

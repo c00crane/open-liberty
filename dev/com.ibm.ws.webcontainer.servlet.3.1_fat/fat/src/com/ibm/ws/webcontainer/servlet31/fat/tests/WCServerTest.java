@@ -10,6 +10,9 @@
  *******************************************************************************/
 package com.ibm.ws.webcontainer.servlet31.fat.tests;
 
+import static componenttest.annotation.SkipForRepeat.NO_MODIFICATION;
+import static componenttest.annotation.SkipForRepeat.EE9_FEATURES;
+
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -41,6 +44,7 @@ import componenttest.annotation.SkipForRepeat;
 import componenttest.custom.junit.runner.FATRunner;
 import componenttest.custom.junit.runner.Mode;
 import componenttest.custom.junit.runner.Mode.TestMode;
+import componenttest.rules.repeater.JakartaEE9Action;
 import componenttest.topology.impl.LibertyServer;
 import junit.framework.Assert;
 
@@ -178,14 +182,7 @@ public class WCServerTest extends LoggingTest {
                 ShrinkHelper.exportAppToServer(SHARED_SERVER.getLibertyServer(), TestServletMappingAnnoApp);
           }
         
-        /*
-         * Specify the deploy options to be server only. With this, we start with a clean state on the
-         * Shared server every time it starts up. Then we deploy the apps as necessary without validating
-         * if the app is already there.
-         */
-        // Drop apps to server
-        // ShrinkHelper.exportAppToServer(SHARED_SERVER.getLibertyServer(), TestServletMappingApp, options);
-        // ShrinkHelper.exportAppToServer(SHARED_SERVER.getLibertyServer(), TestServletMappingAnnoApp, options);
+        
         SHARED_SERVER.startIfNotStarted();
 
         SHARED_SERVER.getLibertyServer().waitForStringInLog("CWWKZ0001I.* " + TEST_SERVLET_31_APP_NAME);
@@ -221,13 +218,14 @@ public class WCServerTest extends LoggingTest {
 
     /**
      * Sample test for running with Servlet 3.1
+     * This test is skipped for servlet-4.0 and servlet-5.0 because
+     * there is already a test for this in the 4.0 fat bucket.
      *
      * @throws Exception
      *                       if something goes horribly wrong
      */
     @Test
-    //@Mode(TestMode.FULL)
-    @SkipForRepeat("SERVLET-4.0")
+    @SkipForRepeat({"SERVLET-4.0", EE9_FEATURES})
     public void testServlet31() throws Exception {
         WebResponse response = this.verifyResponse("/TestServlet31/MyServlet", "Hello World");
 
@@ -236,25 +234,8 @@ public class WCServerTest extends LoggingTest {
                                             true, false);
     }
     
-    /**
-     * Sample test for running with Servlet 4.0
-     *
-     * @throws Exception
-     *                       if something goes horribly wrong
-     */
-    @Test
-    //@Mode(TestMode.FULL)
-    @SkipForRepeat(SkipForRepeat.NO_MODIFICATION)
-    public void testServlet40() throws Exception {
-        WebResponse response = this.verifyResponse("/TestServlet31/MyServlet", "Hello World");
-
-        // verify the X-Powered-By Response header
-        response.verifyResponseHeaderEquals("X-Powered-By", false, "Servlet/4.0",
-                                            true, false);
-    }
 
     @Test
-    //@Mode(TestMode.FULL)
     public void testProgrammaticallyAddedServlet() throws Exception {
         // 130998: This tests that the servlet that was programmatically
         // added with a different servlet name in "MyServletContextListener"
@@ -342,7 +323,6 @@ public class WCServerTest extends LoggingTest {
     }
 
     @Test
-    @Mode(TestMode.LITE)
     public void testRequestedSessionId() throws Exception {
         WebBrowser wb = createWebBrowserForTestCase();
         this.verifyResponse(wb, "/TestServlet31/SessionIdTest;jsessionid=mysessionid",
@@ -351,7 +331,6 @@ public class WCServerTest extends LoggingTest {
     }
 
     @Test
-    @Mode(TestMode.LITE)
     public void testGetServerInfo() throws Exception {
         WebBrowser wb = createWebBrowserForTestCase();
 
@@ -376,7 +355,6 @@ public class WCServerTest extends LoggingTest {
      *                       if validation fails, or if an unexpected error occurs
      */
     @Test
-    //@Mode(TestMode.FULL)
     public void testResponseReset() throws Exception {
         WebBrowser wb = createWebBrowserForTestCase();
         String url = "/TestServlet31/ResponseReset?firstType=pWriter&secondType=pWriter";
@@ -398,27 +376,19 @@ public class WCServerTest extends LoggingTest {
     }
 
     /**
-     * Verifies that the ServletContext.getMinorVersion() returns 1 for Servlet 3.1.
-     *
+     * Verifies that the ServletContext.getMinorVersion() returns 1 and 
+     * ServletContext.getMajorVersion() returns 3 for Servlet 3.1.
+     * This test is skipped for servlet-4.0 and servlet-5.0 because
+     * there is already a test for this in the 4.0 fat bucket.
      * @throws Exception
      */
     @Test
-    @SkipForRepeat("SERVLET-4.0")
-    public void testServlet31ContextMinorVersion() throws Exception {
-        this.verifyResponse("/TestServlet31/MyServlet?TestMinorVersion=true",
+    @SkipForRepeat({"SERVLET-4.0", EE9_FEATURES})
+    public void testServletContextMinorMajorVersion() throws Exception {
+        this.verifyResponse("/TestServlet31/MyServlet?TestMajorMinorVersion=true", 
+                            "majorVersion: 3");
+        this.verifyResponse("/TestServlet31/MyServlet?TestMajorMinorVersion=true",
                             "minorVersion: 1");
-    }
-    
-    /**
-     * Verifies that the ServletContext.getMinorVersion() returns 0 for Servlet 4.0.
-     *
-     * @throws Exception
-     */
-    @Test
-    @SkipForRepeat(SkipForRepeat.NO_MODIFICATION)
-    public void testServlet40ContextMinorVersion() throws Exception {
-        this.verifyResponse("/TestServlet31/MyServlet?TestMinorVersion=true",
-                            "minorVersion: 0");
     }
 
     /**
@@ -433,7 +403,6 @@ public class WCServerTest extends LoggingTest {
 
         LibertyServer wlp = SHARED_SERVER.getLibertyServer();
         wlp.setMarkToEndOfLog();
-//        SHARED_SERVER.setExpectedErrors("SRVE9016E:.*", "CWWKZ0002E:.*");
 
         wlp.saveServerConfiguration();
         // copy server.xml for TestServletMapping.war
@@ -490,7 +459,6 @@ public class WCServerTest extends LoggingTest {
      * @throws Exception
      */
     @Test
-    @Mode(TestMode.LITE)
     public void testProgrammaticListenerAddition() throws Exception {
 
         // Drive a request to the SimpleTestServlet to initialize the application
@@ -513,7 +481,6 @@ public class WCServerTest extends LoggingTest {
      * exception is thrown in this scenario.
      */
     @Test
-    @Mode(TestMode.LITE)
     public void testServletContextCreateListenerBadListener() throws Exception {
 
         // Make sure the test framework knows that SRVE9014E is expected

@@ -22,6 +22,8 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.FileReader;
 import java.security.KeyPair;
+import java.security.cert.Certificate;
+import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -52,9 +54,11 @@ import com.ibm.websphere.simplicity.config.ServerConfiguration;
 import com.ibm.websphere.simplicity.log.Log;
 import com.ibm.ws.security.acme.docker.CAContainer;
 import com.ibm.ws.security.acme.docker.pebble.PebbleContainer;
+import com.ibm.ws.security.acme.internal.util.AcmeConstants;
 import com.ibm.ws.security.acme.internal.web.AcmeCaRestHandler;
 import com.ibm.ws.security.acme.utils.AcmeFatUtils;
 
+import componenttest.annotation.CheckForLeakedPasswords;
 import componenttest.annotation.Server;
 import componenttest.custom.junit.runner.FATRunner;
 import componenttest.topology.impl.LibertyServer;
@@ -86,18 +90,15 @@ public class AcmeCaRestHandlerTest {
 	@ClassRule
 	public static CAContainer pebble = new PebbleContainer();
 
-	private static final String CONTENT_TYPE = "application/json";
-
-	private static final String JSON_ACCOUNT_REGEN_KEYPAIR_VALID = "{\"" + AcmeCaRestHandler.JSON_OPERATION_KEY
-			+ "\":\"" + AcmeCaRestHandler.JSON_OPERATION_REGEN_ACCT_KEY_PAIR + "\"}";
-	private static final String JSON_ACCOUNT_REGEN_KEYPAIR_INVALID = "{\"" + AcmeCaRestHandler.JSON_OPERATION_KEY
+	private static final String JSON_ACCOUNT_REGEN_KEYPAIR_VALID = "{\"" + AcmeCaRestHandler.OP_KEY + "\":\""
+			+ AcmeCaRestHandler.OP_RENEW_ACCT_KEY_PAIR + "\"}";
+	private static final String JSON_ACCOUNT_REGEN_KEYPAIR_INVALID = "{\"" + AcmeCaRestHandler.OP_KEY
 			+ "\":\"invalid\"}";
 	private static final String JSON_EMPTY = "{}";
 
-	private static final String JSON_CERT_REGEN_VALID = "{\"" + AcmeCaRestHandler.JSON_OPERATION_KEY + "\":\""
-			+ AcmeCaRestHandler.JSON_OPERATION_REGEN_CERT + "\"}";
-	private static final String JSON_CERT_REGEN_INVALID = "{\"" + AcmeCaRestHandler.JSON_OPERATION_KEY
-			+ "\":\"invalid\"}";
+	private static final String JSON_CERT_REGEN = "{\"" + AcmeCaRestHandler.OP_KEY + "\":\""
+			+ AcmeCaRestHandler.OP_RENEW_CERT + "\"}";
+	private static final String JSON_CERT_INVALID_OP = "{\"" + AcmeCaRestHandler.OP_KEY + "\":\"invalid\"}";
 
 	private static final String CONTENT_TYPE_HTML = "text/html";
 	private static final String CONTENT_TYPE_JSON = "application/json";
@@ -121,7 +122,7 @@ public class AcmeCaRestHandlerTest {
 		/*
 		 * Configure the acmeCA-2.0 feature.
 		 */
-		AcmeFatUtils.configureAcmeCA(server, pebble, ORIGINAL_CONFIG, DOMAINS);
+		AcmeFatUtils.configureAcmeCA(server, pebble, ORIGINAL_CONFIG, false, true, DOMAINS);
 
 		server.startServer();
 		AcmeFatUtils.waitForAcmeToCreateCertificate(server);
@@ -134,7 +135,7 @@ public class AcmeCaRestHandlerTest {
 		/*
 		 * Stop the server.
 		 */
-		server.stopServer();
+		server.stopServer("CWPKI2058W");
 	}
 
 	@Test
@@ -163,7 +164,7 @@ public class AcmeCaRestHandlerTest {
 		KeyPair keyPair1 = KeyPairUtils.readKeyPair(
 				new FileReader(new File(server.getServerRoot() + "/resources/security/acmeAccountKey.pem")));
 		String jsonResponse = performPost(ACCOUNT_ENDPOINT, 200, CONTENT_TYPE_JSON, ADMIN_USER, ADMIN_PASS,
-				CONTENT_TYPE, JSON_ACCOUNT_REGEN_KEYPAIR_VALID);
+				CONTENT_TYPE_JSON, JSON_ACCOUNT_REGEN_KEYPAIR_VALID);
 		assertJsonResponse(jsonResponse, 200);
 		KeyPair keyPair2 = KeyPairUtils.readKeyPair(
 				new FileReader(new File(server.getServerRoot() + "/resources/security/acmeAccountKey.pem")));
@@ -174,7 +175,7 @@ public class AcmeCaRestHandlerTest {
 		/*
 		 * Do it one more time.
 		 */
-		jsonResponse = performPost(ACCOUNT_ENDPOINT, 200, CONTENT_TYPE_JSON, ADMIN_USER, ADMIN_PASS, CONTENT_TYPE,
+		jsonResponse = performPost(ACCOUNT_ENDPOINT, 200, CONTENT_TYPE_JSON, ADMIN_USER, ADMIN_PASS, CONTENT_TYPE_JSON,
 				JSON_ACCOUNT_REGEN_KEYPAIR_VALID);
 		assertJsonResponse(jsonResponse, 200);
 		KeyPair keyPair3 = KeyPairUtils.readKeyPair(
@@ -201,35 +202,35 @@ public class AcmeCaRestHandlerTest {
 	@Test
 	public void account_endpoint_post_no_content() throws Exception {
 		String jsonResponse = performPost(ACCOUNT_ENDPOINT, 400, CONTENT_TYPE_JSON, ADMIN_USER, ADMIN_PASS,
-				CONTENT_TYPE, null);
+				CONTENT_TYPE_JSON, null);
 		assertJsonResponse(jsonResponse, 400);
 	}
 
 	@Test
 	public void account_endpoint_post_empty_json() throws Exception {
 		String jsonResponse = performPost(ACCOUNT_ENDPOINT, 400, CONTENT_TYPE_JSON, ADMIN_USER, ADMIN_PASS,
-				CONTENT_TYPE, JSON_EMPTY);
+				CONTENT_TYPE_JSON, JSON_EMPTY);
 		assertJsonResponse(jsonResponse, 400);
 	}
 
 	@Test
 	public void account_endpoint_post_invalid_operation() throws Exception {
 		String jsonResponse = performPost(ACCOUNT_ENDPOINT, 400, CONTENT_TYPE_JSON, ADMIN_USER, ADMIN_PASS,
-				CONTENT_TYPE, JSON_ACCOUNT_REGEN_KEYPAIR_INVALID);
+				CONTENT_TYPE_JSON, JSON_ACCOUNT_REGEN_KEYPAIR_INVALID);
 		assertJsonResponse(jsonResponse, 400);
 	}
 
 	@Test
 	public void account_endpoint_post_reader_unauthorized() throws Exception {
 		String jsonResponse = performPost(ACCOUNT_ENDPOINT, 403, CONTENT_TYPE_JSON, READER_USER, READER_PASS,
-				CONTENT_TYPE, JSON_ACCOUNT_REGEN_KEYPAIR_VALID);
+				CONTENT_TYPE_JSON, JSON_ACCOUNT_REGEN_KEYPAIR_VALID);
 		assertJsonResponse(jsonResponse, 403);
 	}
 
 	@Test
 	public void account_endpoint_post_unauthorized_user() throws Exception {
 		String jsonResponse = performPost(ACCOUNT_ENDPOINT, 403, CONTENT_TYPE_JSON, UNAUTHORIZED_USER,
-				UNAUTHORIZED_PASS, CONTENT_TYPE, JSON_ACCOUNT_REGEN_KEYPAIR_VALID);
+				UNAUTHORIZED_PASS, CONTENT_TYPE_JSON, JSON_ACCOUNT_REGEN_KEYPAIR_VALID);
 		assertJsonResponse(jsonResponse, 403);
 	}
 
@@ -269,7 +270,7 @@ public class AcmeCaRestHandlerTest {
 	}
 
 	@Test
-	public void certificate_endpoint_post_admin_authorized() throws Exception {
+	public void certificate_endpoint_post_renew_certificate() throws Exception {
 		/*
 		 * Get certificate info first.
 		 */
@@ -279,7 +280,7 @@ public class AcmeCaRestHandlerTest {
 		 * Request a new certificate.
 		 */
 		String jsonResponse = performPost(CERTIFICATE_ENDPOINT, 200, CONTENT_TYPE_JSON, ADMIN_USER, ADMIN_PASS,
-				CONTENT_TYPE, JSON_CERT_REGEN_VALID);
+				CONTENT_TYPE_JSON, JSON_CERT_REGEN);
 		assertJsonResponse(jsonResponse, 200);
 		AcmeFatUtils.waitForAcmeToCreateCertificate(server);
 		AcmeFatUtils.waitForSslEndpoint(server);
@@ -297,49 +298,49 @@ public class AcmeCaRestHandlerTest {
 	@Test
 	public void certificate_endpoint_post_invalid_content_type() throws Exception {
 		String jsonResponse = performPost(CERTIFICATE_ENDPOINT, 415, CONTENT_TYPE_JSON, ADMIN_USER, ADMIN_PASS,
-				"application/invalid", JSON_CERT_REGEN_VALID);
+				"application/invalid", JSON_CERT_REGEN);
 		assertJsonResponse(jsonResponse, 415);
 	}
 
 	@Test
 	public void certificate_endpoint_post_no_content_type() throws Exception {
 		String jsonResponse = performPost(CERTIFICATE_ENDPOINT, 415, CONTENT_TYPE_JSON, ADMIN_USER, ADMIN_PASS, null,
-				JSON_CERT_REGEN_VALID);
+				JSON_CERT_REGEN);
 		assertJsonResponse(jsonResponse, 415);
 	}
 
 	@Test
 	public void certificate_endpoint_post_no_content() throws Exception {
 		String jsonResponse = performPost(CERTIFICATE_ENDPOINT, 400, CONTENT_TYPE_JSON, ADMIN_USER, ADMIN_PASS,
-				CONTENT_TYPE, null);
+				CONTENT_TYPE_JSON, null);
 		assertJsonResponse(jsonResponse, 400);
 	}
 
 	@Test
 	public void certificate_endpoint_post_empty_json() throws Exception {
 		String jsonResponse = performPost(CERTIFICATE_ENDPOINT, 400, CONTENT_TYPE_JSON, ADMIN_USER, ADMIN_PASS,
-				CONTENT_TYPE, JSON_EMPTY);
+				CONTENT_TYPE_JSON, JSON_EMPTY);
 		assertJsonResponse(jsonResponse, 400);
 	}
 
 	@Test
 	public void certificate_endpoint_post_invalid_operation() throws Exception {
 		String jsonResponse = performPost(CERTIFICATE_ENDPOINT, 400, CONTENT_TYPE_JSON, ADMIN_USER, ADMIN_PASS,
-				CONTENT_TYPE, JSON_CERT_REGEN_INVALID);
+				CONTENT_TYPE_JSON, JSON_CERT_INVALID_OP);
 		assertJsonResponse(jsonResponse, 400);
 	}
 
 	@Test
 	public void certificate_endpoint_post_reader_unauthorized() throws Exception {
 		String jsonResponse = performPost(CERTIFICATE_ENDPOINT, 403, CONTENT_TYPE_JSON, READER_USER, READER_PASS,
-				CONTENT_TYPE, JSON_CERT_REGEN_VALID);
+				CONTENT_TYPE_JSON, JSON_CERT_REGEN);
 		assertJsonResponse(jsonResponse, 403);
 	}
 
 	@Test
 	public void certificate_endpoint_post_unauthorized_user() throws Exception {
 		String jsonResponse = performPost(CERTIFICATE_ENDPOINT, 403, CONTENT_TYPE_JSON, UNAUTHORIZED_USER,
-				UNAUTHORIZED_PASS, CONTENT_TYPE, JSON_CERT_REGEN_VALID);
+				UNAUTHORIZED_PASS, CONTENT_TYPE_JSON, JSON_CERT_REGEN);
 		assertJsonResponse(jsonResponse, 403);
 	}
 
@@ -401,8 +402,8 @@ public class AcmeCaRestHandlerTest {
 
 	@Test
 	public void root_endpoint_post_method_not_allowed() throws Exception {
-		String jsonResponse = performPost(ROOT_ENDPOINT, 405, CONTENT_TYPE_JSON, ADMIN_USER, ADMIN_PASS, CONTENT_TYPE,
-				JSON_ACCOUNT_REGEN_KEYPAIR_VALID);
+		String jsonResponse = performPost(ROOT_ENDPOINT, 405, CONTENT_TYPE_JSON, ADMIN_USER, ADMIN_PASS,
+				CONTENT_TYPE_JSON, JSON_ACCOUNT_REGEN_KEYPAIR_VALID);
 		assertJsonResponse(jsonResponse, 405);
 	}
 
@@ -768,6 +769,97 @@ public class AcmeCaRestHandlerTest {
 					not(containsString("\"message\":")));
 		} else {
 			assertThat("Expected error message in JSON response.", jsonResponse, containsString("\"message\":"));
+		}
+	}
+	
+	/**
+	 * Make sure we are blocked when we do back to back renew requests.
+	 * 
+	 * @throws Exception If the test failed for some reason.
+	 */
+	@Test
+	@CheckForLeakedPasswords(AcmeFatUtils.CACERTS_TRUSTSTORE_PASSWORD)
+	public void certificate_endpoint_post_repeated_renew () throws Exception {
+		final String methodName = "certificate_endpoint_post_repeated_renew";
+		Certificate[] startingCertificateChain = null, endingCertificateChain = null;
+
+		/*
+		 * Enable the minimum renew window 
+		 * 
+		 */
+
+		ServerConfiguration clone = server.getServerConfiguration().clone();
+		clone.getAcmeCA().setDisableMinRenewWindow(false);
+		
+
+		/***********************************************************************
+		 * 
+		 * The server will request a certificate successfully, then request
+		 * more back to back, which should fail. Then we'll sleep and should
+		 * have a successful request again.
+		 * 
+		 **********************************************************************/
+		try {
+			Log.info(this.getClass(), methodName, "TEST Run back to back REST renew requests");
+
+			AcmeFatUtils.updateConfigDynamically(server, clone);
+
+			/*
+			 * First renew request should update.
+			 */
+			startingCertificateChain = AcmeFatUtils.assertAndGetServerCertificate(server, pebble);
+
+			String jsonResponse = performPost(AcmeCaRestHandlerTest.CERTIFICATE_ENDPOINT, 200, AcmeCaRestHandlerTest.CONTENT_TYPE_JSON, AcmeCaRestHandlerTest.ADMIN_USER, AcmeCaRestHandlerTest.ADMIN_PASS,
+					AcmeCaRestHandlerTest.CONTENT_TYPE_JSON, AcmeCaRestHandlerTest.JSON_CERT_REGEN);
+			assertJsonResponse(jsonResponse, 200);
+			AcmeFatUtils.waitForNewCert(server, pebble, startingCertificateChain);
+			
+			/*
+			 * Do back to back renew requests, we should be blocked from renewing
+			 */
+			
+			for (int i=1; i< 4; i++) {
+				
+				Log.info(this.getClass(), testName.getMethodName(), "Renew round " + i);
+				
+				startingCertificateChain = AcmeFatUtils.assertAndGetServerCertificate(server, pebble);
+
+				jsonResponse = performPost(AcmeCaRestHandlerTest.CERTIFICATE_ENDPOINT, 429, AcmeCaRestHandlerTest.CONTENT_TYPE_JSON, AcmeCaRestHandlerTest.ADMIN_USER, AcmeCaRestHandlerTest.ADMIN_PASS,
+						AcmeCaRestHandlerTest.CONTENT_TYPE_JSON, AcmeCaRestHandlerTest.JSON_CERT_REGEN);
+				assertThat("Unexpected HTTP status code returned in JSON response.", jsonResponse,
+						containsString("\"httpCode\":" + 429));
+				assertThat("Expected error message in JSON response.", jsonResponse, containsString("\"message\":"));
+				
+				Log.info(this.getClass(), methodName, "Response received: " + jsonResponse);
+				
+				endingCertificateChain = AcmeFatUtils.assertAndGetServerCertificate(server, pebble);
+
+				assertEquals("The certificate should not renew after REST request.",
+						((X509Certificate) startingCertificateChain[0]).getSerialNumber(),
+						((X509Certificate) endingCertificateChain[0]).getSerialNumber());
+			}
+			
+			/*
+			 * Allow the minimum time to expire, next reqeust should be successful
+			 */
+			Thread.sleep(AcmeConstants.RENEW_CERT_MIN + 2000);
+			
+			startingCertificateChain = AcmeFatUtils.assertAndGetServerCertificate(server, pebble);
+
+			jsonResponse = performPost(AcmeCaRestHandlerTest.CERTIFICATE_ENDPOINT, 200, AcmeCaRestHandlerTest.CONTENT_TYPE_JSON, AcmeCaRestHandlerTest.ADMIN_USER, AcmeCaRestHandlerTest.ADMIN_PASS,
+					AcmeCaRestHandlerTest.CONTENT_TYPE_JSON, AcmeCaRestHandlerTest.JSON_CERT_REGEN);
+			assertJsonResponse(jsonResponse, 200);
+			
+			AcmeFatUtils.waitForNewCert(server, pebble, startingCertificateChain);
+
+		} finally {
+			/*
+			 * Disable min renew so the rest of the tests can pass without extra time
+			 * spent sleeping
+			 */
+			clone = server.getServerConfiguration().clone();
+			clone.getAcmeCA().setDisableMinRenewWindow(true);
+			AcmeFatUtils.updateConfigDynamically(server, clone);
 		}
 	}
 }

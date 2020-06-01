@@ -25,6 +25,8 @@ public class AcmeCA extends ConfigElement {
 
     private String accountKeyFile;
 
+    private AcmeRevocationChecker acmeRevocationChecker;
+
     private AcmeTransportConfig acmeTransportConfig;
 
     private Integer challengeRetries;
@@ -47,6 +49,12 @@ public class AcmeCA extends ConfigElement {
 
     private String renewBeforeExpiration;
 
+    private String certCheckerSchedule;
+
+    private String certCheckerErrorSchedule;
+
+    private boolean disableMinRenewWindow;
+
     /**
      * @return the accountContact
      */
@@ -59,6 +67,13 @@ public class AcmeCA extends ConfigElement {
      */
     public String getAccountKeyFile() {
         return accountKeyFile;
+    }
+
+    /**
+     * @return the acmeRevocationChecker
+     */
+    public AcmeRevocationChecker getAcmeRevocationChecker() {
+        return acmeRevocationChecker;
     }
 
     /**
@@ -145,6 +160,14 @@ public class AcmeCA extends ConfigElement {
     @XmlAttribute(name = "accountKeyFile")
     public void setAccountKeyFile(String accountKeyFile) {
         this.accountKeyFile = accountKeyFile;
+    }
+
+    /**
+     * @param acmeRevocationChecker the acmeRevocationChecker to set
+     */
+    @XmlElement(name = "acmeRevocationChecker")
+    public void setAcmeRevocationChecker(AcmeRevocationChecker acmeRevocationChecker) {
+        this.acmeRevocationChecker = acmeRevocationChecker;
     }
 
     /**
@@ -242,6 +265,33 @@ public class AcmeCA extends ConfigElement {
         this.renewBeforeExpiration = renewBeforeExpiration;
     }
 
+    public String getCertCheckerSchedule() {
+        return certCheckerSchedule;
+    }
+
+    @XmlAttribute(name = "certCheckerSchedule")
+    public void setCertCheckerSchedule(String certCheckerSchedule) {
+        this.certCheckerSchedule = certCheckerSchedule;
+    }
+
+    public String getCertCheckerErrorSchedule() {
+        return certCheckerErrorSchedule;
+    }
+
+    @XmlAttribute(name = "certCheckerErrorSchedule")
+    public void setCertCheckerErrorSchedule(String certCheckerErrorSchedule) {
+        this.certCheckerErrorSchedule = certCheckerErrorSchedule;
+    }
+
+    @XmlAttribute(name = "disableMinRenewWindow")
+    public void setDisableMinRenewWindow(boolean disableMinRenewWindow) {
+        this.disableMinRenewWindow = disableMinRenewWindow;
+    }
+
+    public boolean isDisableMinRenewWindow() {
+        return disableMinRenewWindow;
+    }
+
     @Override
     public String toString() {
         StringBuffer sb = new StringBuffer();
@@ -254,8 +304,17 @@ public class AcmeCA extends ConfigElement {
         if (accountKeyFile != null) {
             sb.append("accountKeyFile=\"").append(accountKeyFile).append("\" ");;
         }
+        if (acmeRevocationChecker != null) {
+            sb.append("acmeRevocationChecker=\"").append(acmeRevocationChecker).append("\" ");;
+        }
         if (acmeTransportConfig != null) {
             sb.append("acmeTransportConfig=\"").append(acmeTransportConfig).append("\" ");;
+        }
+        if (certCheckerSchedule != null) {
+            sb.append("certCheckerSchedule=\"").append(certCheckerSchedule).append("\" ");;
+        }
+        if (certCheckerErrorSchedule != null) {
+            sb.append("certCheckerErrorSchedule=\"").append(certCheckerErrorSchedule).append("\" ");;
         }
         if (challengeRetries != null) {
             sb.append("challengeRetries=\"").append(challengeRetries).append("\" ");;
@@ -265,6 +324,9 @@ public class AcmeCA extends ConfigElement {
         }
         if (directoryURI != null) {
             sb.append("directoryURI=\"").append(directoryURI).append("\" ");;
+        }
+        if (disableMinRenewWindow) {
+            sb.append("disableMinRenewWindow=\"").append(disableMinRenewWindow).append("\" ");;
         }
         if (domainKeyFile != null) {
             sb.append("domainKeyFile=\"").append(domainKeyFile).append("\" ");;
@@ -278,14 +340,14 @@ public class AcmeCA extends ConfigElement {
         if (orderRetryWait != null) {
             sb.append("orderRetryWait=\"").append(orderRetryWait).append("\" ");;
         }
+        if (renewBeforeExpiration != null) {
+            sb.append("renewBeforeExpiration=\"").append(renewBeforeExpiration).append("\" ");;
+        }
         if (subjectDN != null) {
             sb.append("subjectDN=\"").append(subjectDN).append("\" ");;
         }
         if (validFor != null) {
             sb.append("validFor=\"").append(validFor).append("\" ");;
-        }
-        if (renewBeforeExpiration != null) {
-            sb.append("renewBeforeExpiration=\"").append(renewBeforeExpiration).append("\" ");;
         }
 
         sb.append("}");
@@ -383,6 +445,104 @@ public class AcmeCA extends ConfigElement {
             }
             if (trustStoreType != null) {
                 sb.append("trustStoreType=\"").append(trustStoreType).append("\" ");;
+            }
+
+            sb.append("}");
+
+            return sb.toString();
+        }
+    }
+
+    /**
+     * ACME certificate revocation checker for the acmeCA-2.0 feature.
+     */
+    public static class AcmeRevocationChecker {
+
+        private Boolean enabled;
+
+        private String ocspResponderUrl;
+
+        private Boolean preferCRLs;
+
+        private Boolean disableFallback;
+
+        /**
+         * @return the ocspResponderUrl
+         */
+        public Boolean getEnabled() {
+            return enabled;
+        }
+
+        /**
+         * @return the ocspResponderUrl
+         */
+        public String getOcspResponderUrl() {
+            return ocspResponderUrl;
+        }
+
+        /**
+         * @return the preferCRLs
+         */
+        public Boolean getPreferCRLs() {
+            return preferCRLs;
+        }
+
+        /**
+         * @return the disableFallback
+         */
+        public Boolean getDisableFallback() {
+            return disableFallback;
+        }
+
+        /**
+         * @param enabled the enabled to set
+         */
+        @XmlAttribute(name = "enabled")
+        public void setEnabled(Boolean enabled) {
+            this.enabled = enabled;
+        }
+
+        /**
+         * @param ocspResponderUrl the ocspResponderUrl to set
+         */
+        @XmlAttribute(name = "ocspResponderUrl")
+        public void setOcspResponderUrl(String ocspResponderUrl) {
+            this.ocspResponderUrl = ocspResponderUrl;
+        }
+
+        /**
+         * @param preferCRLs the preferCRLs to set
+         */
+        @XmlAttribute(name = "preferCRLs")
+        public void setPreferCRLs(Boolean preferCRLs) {
+            this.preferCRLs = preferCRLs;
+        }
+
+        /**
+         * @param disableFallback the disableFallback to set
+         */
+        @XmlAttribute(name = "disableFallback")
+        public void setDisableFallback(Boolean disableFallback) {
+            this.disableFallback = disableFallback;
+        }
+
+        @Override
+        public String toString() {
+            StringBuffer sb = new StringBuffer();
+
+            sb.append(getClass().getSimpleName()).append("{ ");
+
+            if (enabled != null) {
+                sb.append("enabled=\"").append(enabled).append("\" ");;
+            }
+            if (disableFallback != null) {
+                sb.append("disableFallback=\"").append(disableFallback).append("\" ");;
+            }
+            if (ocspResponderUrl != null) {
+                sb.append("ocspResponderUrl=\"").append(ocspResponderUrl).append("\" ");;
+            }
+            if (preferCRLs != null) {
+                sb.append("preferCRLs=\"").append(preferCRLs).append("\" ");;
             }
 
             sb.append("}");

@@ -18,6 +18,7 @@ import java.util.List;
 import com.ibm.websphere.ras.annotation.Sensitive;
 import com.ibm.ws.crypto.certificateutil.DefaultSSLCertificateCreator;
 import com.ibm.ws.security.acme.internal.AcmeClient.AcmeAccount;
+import com.ibm.ws.security.acme.internal.exceptions.CertificateRenewRequestBlockedException;
 
 /**
  * An interface to define the methods that an ACME 2.0 OSGi service will
@@ -89,6 +90,24 @@ public interface AcmeProvider {
 	public void renewCertificate() throws AcmeCaException;
 
 	/**
+	 * Revoke the certificate.
+	 * 
+	 * @param reason
+	 *            The reason the certificate is being revoked. The following
+	 *            reason are supported: UNSPECIFIED, KEY_COMPROMISE,
+	 *            CA_COMPROMISE, AFFILIATION_CHANGED, SUPERSEDED,
+	 *            CESSATION_OF_OPERATIONS, CERTIFICATE_HOLD, REMOVE_FROM_CRL,
+	 *            PRIVILEGE_WITHDRAWN and AA_COMPROMISE. If null, the reason
+	 *            "UNSPECIFIED" will be used.
+	 * @throws IllegalRevocationReasonException
+	 *             Thrown if the supplied reason is not one of the supported
+	 *             revocation reasons.
+	 * @throws AcmeCaException
+	 *             If there was an error revoking the certificate.
+	 */
+	public void revokeCertificate(String reason) throws AcmeCaException;
+
+	/**
 	 * Updates the default SSL certificate. It is expected that if the default
 	 * certificate is replaced, that both the {@link KeyStore} and the file are
 	 * updated with the new certificate.
@@ -106,5 +125,14 @@ public interface AcmeProvider {
 	 */
 	public void updateDefaultSSLCertificate(KeyStore keyStore, File keyStoreFile, @Sensitive String password)
 			throws CertificateException;
+	
+	/**
+	 * Checks whether a certificate renew is allowed. If a renew just happened, the
+	 * request is blocked.
+	 * 
+	 * @throws AcmeCaException
+	 * 			If a certificate renew just happened
+	 */
+	public void checkCertificateRenewAllowed() throws AcmeCaException;
 
 }
