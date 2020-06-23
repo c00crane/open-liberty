@@ -357,7 +357,8 @@ public class JwtTokenHeaderExpectationTests extends JwtTokenHeaderExpectationTes
                 exp.validate(null);
                 fail("Should have thrown an error validating the JSON data but did not.");
             } catch (Throwable e) {
-                verifyException(e, exp.getFailureMsg() + ".*java.lang.IllegalStateException: Improperly formatted JWT Token - wrong number of parts.*");
+                verifyException(e, "Provided content is null so cannot be validated.");
+//                verifyException(e, exp.getFailureMsg() + ".*java.lang.IllegalStateException: Improperly formatted JWT Token - wrong number of parts.*");
             }
         } catch (Throwable t) {
             outputMgr.failWithThrowable(testName.getMethodName(), t);
