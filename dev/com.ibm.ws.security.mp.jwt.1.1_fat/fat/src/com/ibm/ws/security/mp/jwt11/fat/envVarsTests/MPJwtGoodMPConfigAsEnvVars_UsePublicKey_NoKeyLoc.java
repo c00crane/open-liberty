@@ -43,7 +43,8 @@ public class MPJwtGoodMPConfigAsEnvVars_UsePublicKey_NoKeyLoc extends MPJwtGoodM
 
         setUpAndStartBuilderServer(jwtBuilderServer, "server_using_buildApp.xml");
 
-        MP11ConfigSettings mpConfigSettings = new MP11ConfigSettings(MP11ConfigSettings.PublicKeyLocationNotSet, MP11ConfigSettings.ComplexPublicKey, MP11ConfigSettings.IssuerNotSet, MpJwtFatConstants.X509_CERT);
+        MP11ConfigSettings mpConfigSettings = new MP11ConfigSettings(MP11ConfigSettings.PublicKeyLocationNotSet, MP11ConfigSettings.ComplexPublicKey, MP11ConfigSettings
+                        .buildDefaultIssuerString(jwtBuilderServer), MpJwtFatConstants.X509_CERT);
         setUpAndStartRSServerForTests(resourceServer, "rs_server_AltConfigNotInApp_noServerXmlConfig.xml", mpConfigSettings, MPConfigLocation.ENV_VAR);
 
     }

@@ -35,7 +35,6 @@ import componenttest.topology.impl.LibertyServer;
  *
  **/
 
-@SuppressWarnings("restriction")
 @Mode(TestMode.FULL)
 @RunWith(FATRunner.class)
 public class MPJwtMPConfigInApp_NoMPJwtConfigInServerXml_Tests extends MPJwt11MPConfigTests {
@@ -51,7 +50,8 @@ public class MPJwtMPConfigInApp_NoMPJwtConfigInServerXml_Tests extends MPJwt11MP
         setUpAndStartBuilderServer(jwtBuilderServer, "server_using_buildApp.xml");
 
         // server has an empty mpJwt config
-        MP11ConfigSettings mpConfigSettings = new MP11ConfigSettings(MP11ConfigSettings.PemFile, MP11ConfigSettings.PublicKeyNotSet, MP11ConfigSettings.IssuerNotSet, MpJwtFatConstants.X509_CERT);
+        MP11ConfigSettings mpConfigSettings = new MP11ConfigSettings(MP11ConfigSettings.PemFile, MP11ConfigSettings.PublicKeyNotSet, MP11ConfigSettings
+                        .buildDefaultIssuerString(jwtBuilderServer), MpJwtFatConstants.X509_CERT);
         setUpAndStartRSServerForTests(resourceServer, "rs_server_AltConfigInApp_noServerXmlConfig.xml", mpConfigSettings, MPConfigLocation.IN_APP);
 
     }

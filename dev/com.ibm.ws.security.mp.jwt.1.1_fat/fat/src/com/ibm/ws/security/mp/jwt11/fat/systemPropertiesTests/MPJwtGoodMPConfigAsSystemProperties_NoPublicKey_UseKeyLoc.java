@@ -44,9 +44,10 @@ public class MPJwtGoodMPConfigAsSystemProperties_NoPublicKey_UseKeyLoc extends M
         setUpAndStartBuilderServer(jwtBuilderServer, "server_using_buildApp.xml");
 
         // server has an empty mpJwt config
-        MP11ConfigSettings mpConfigSettings = new MP11ConfigSettings(MP11ConfigSettings.PemFile, MP11ConfigSettings.PublicKeyNotSet, MP11ConfigSettings.IssuerNotSet, MpJwtFatConstants.X509_CERT);
+        MP11ConfigSettings mpConfigSettings = new MP11ConfigSettings(MP11ConfigSettings.PemFile, MP11ConfigSettings.PublicKeyNotSet, MP11ConfigSettings
+                        .buildDefaultIssuerString(jwtBuilderServer), MpJwtFatConstants.X509_CERT);
 
-        setUpAndStartRSServerForTests(resourceServer, "rs_server_AltConfigNotInApp_noServerXmlConfig.xml", mpConfigSettings, MPConfigLocation.SYSTEM_VAR);
+        setUpAndStartRSServerForTests(resourceServer, "rs_server_AltConfigNotInApp_noServerXmlConfig.xml", mpConfigSettings, MPConfigLocation.SYSTEM_PROP);
 
     }
 

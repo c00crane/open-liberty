@@ -12,8 +12,6 @@ package com.ibm.ws.security.mp.jwt11.fat.sharedTests;
 
 import java.util.HashMap;
 
-import javax.servlet.http.HttpServletResponse;
-
 import org.junit.ClassRule;
 import org.junit.runner.RunWith;
 
@@ -21,13 +19,10 @@ import com.gargoylesoftware.htmlunit.Page;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.ibm.websphere.simplicity.log.Log;
 import com.ibm.ws.security.fat.common.expectations.Expectations;
-import com.ibm.ws.security.fat.common.expectations.ResponseStatusExpectation;
-import com.ibm.ws.security.fat.common.expectations.ServerMessageExpectation;
 import com.ibm.ws.security.fat.common.utils.CommonIOUtils;
 import com.ibm.ws.security.fat.common.utils.SecurityFatHttpUtils;
 import com.ibm.ws.security.jwt.fat.mpjwt.MpJwtFatConstants;
 import com.ibm.ws.security.mp.jwt11.fat.utils.MP11ConfigSettings;
-import com.ibm.ws.security.mp.jwt11.fat.utils.MpJwtMessageConstants;
 
 import componenttest.annotation.Server;
 import componenttest.custom.junit.runner.FATRunner;
@@ -56,9 +51,6 @@ public class MPJwt11MPConfigTests extends MPJwtMPConfigTests {
     @ClassRule
     public static RepeatTests r = RepeatTests.withoutModification();
 
-    public static final String BadKey = "BadKey";
-    public static final String KeyMismatch = "KeyMismatch";
-
     /******************************************** helper methods **************************************/
 
     /**
@@ -79,7 +71,7 @@ public class MPJwt11MPConfigTests extends MPJwtMPConfigTests {
     protected static void setUpAndStartRSServerForTests(LibertyServer server, String configFile, MP11ConfigSettings mpConfigSettings,
                                                         MPConfigLocation mpConfigLocation) throws Exception {
 
-        setupBootstrapPropertiesForMPTests(server, mpConfigSettings);
+        setupBootstrapPropertiesForMPTests(server, MP11ConfigSettings.jwksUri, mpConfigSettings.getCertType().equals(MpJwtFatConstants.JWK_CERT));
 
         setupMPConfig(server, mpConfigSettings, mpConfigLocation);
 
@@ -109,7 +101,7 @@ public class MPJwt11MPConfigTests extends MPJwtMPConfigTests {
 
         Log.info(thisClass, "setupMPConfig", "mpConfigLocation is set to: " + mpConfigLocation.toString());
         switch (mpConfigLocation) {
-            case SYSTEM_VAR:
+            case SYSTEM_PROP:
                 // if we're testing system properties, we'll need to update the values in the jvm.options file (if the file exists, update it)
                 setAlternateMP_ConfigProperties_InJvmOptions(theServer, mpConfigSettings);
                 setupUtils.deployRSServerNoMPConfigInAppApp(theServer);
@@ -263,9 +255,11 @@ public class MPJwt11MPConfigTests extends MPJwtMPConfigTests {
             setupUtils.deployRSServerMPConfigInAppUnderWebInfApp(server, MpJwtFatConstants.BAD_ISSUER_IN_CONFIG_UNDER_WEB_INF_ROOT_CONTEXT,
                                                                  buildMPConfigFileContent(mpConfigSettings.getPublicKey(), mpConfigSettings.getPublicKeyLocation(), "badIssuer"));
             setupUtils.deployRSServerMPConfigInAppInMetaInfApp(server, MpJwtFatConstants.BAD_ISSUER_ONLY_IN_CONFIG_IN_META_INF_ROOT_CONTEXT,
-                                                               buildMPConfigFileContent(MP11ConfigSettings.PublicKeyNotSet, MP11ConfigSettings.PublicKeyLocationNotSet, "badIssuer"));
+                                                               buildMPConfigFileContent(MP11ConfigSettings.PublicKeyNotSet, MP11ConfigSettings.PublicKeyLocationNotSet,
+                                                                                        "badIssuer"));
             setupUtils.deployRSServerMPConfigInAppUnderWebInfApp(server, MpJwtFatConstants.BAD_ISSUER_ONLY_IN_CONFIG_UNDER_WEB_INF_ROOT_CONTEXT,
-                                                                 buildMPConfigFileContent(MP11ConfigSettings.PublicKeyNotSet, MP11ConfigSettings.PublicKeyLocationNotSet, "badIssuer"));
+                                                                 buildMPConfigFileContent(MP11ConfigSettings.PublicKeyNotSet, MP11ConfigSettings.PublicKeyLocationNotSet,
+                                                                                          "badIssuer"));
 
             // publicKey (NOT keyLocation)
             setupUtils.deployRSServerMPConfigInAppInMetaInfApp(server, MpJwtFatConstants.GOOD_COMPLEX_PUBLICKEY_IN_CONFIG_IN_META_INF_ROOT_CONTEXT,
@@ -283,12 +277,14 @@ public class MPJwt11MPConfigTests extends MPJwtMPConfigTests {
             setupUtils.deployRSServerMPConfigInAppInMetaInfApp(server, MpJwtFatConstants.BAD_PUBLICKEY_IN_CONFIG_IN_META_INF_ROOT_CONTEXT,
                                                                buildMPConfigFileContent("badPublicKey", MP11ConfigSettings.PublicKeyLocationNotSet, mpConfigSettings.getIssuer()));
             setupUtils.deployRSServerMPConfigInAppUnderWebInfApp(server, MpJwtFatConstants.BAD_PUBLICKEY_IN_CONFIG_UNDER_WEB_INF_ROOT_CONTEXT,
-                                                                 buildMPConfigFileContent("badPublicKey", MP11ConfigSettings.PublicKeyLocationNotSet, mpConfigSettings.getIssuer()));
+                                                                 buildMPConfigFileContent("badPublicKey", MP11ConfigSettings.PublicKeyLocationNotSet,
+                                                                                          mpConfigSettings.getIssuer()));
 
             // publicKeyLocation (NOT publicKey)
             // not testing all locations (relative, file, url, jwksuri) with all pem loc types (good pem, complex pem, bad pem)
             setupUtils.deployRSServerMPConfigInAppInMetaInfApp(server, MpJwtFatConstants.GOOD_RELATIVE_KEYLOCATION_IN_CONFIG_IN_META_INF_ROOT_CONTEXT,
-                                                               buildMPConfigFileContent(MP11ConfigSettings.PublicKeyNotSet, MP11ConfigSettings.PemFile, mpConfigSettings.getIssuer()));
+                                                               buildMPConfigFileContent(MP11ConfigSettings.PublicKeyNotSet, MP11ConfigSettings.PemFile,
+                                                                                        mpConfigSettings.getIssuer()));
             setupUtils.deployRSServerMPConfigInAppInMetaInfApp(server, MpJwtFatConstants.GOOD_RELATIVE_COMPLEX_KEYLOCATION_IN_CONFIG_IN_META_INF_ROOT_CONTEXT,
                                                                buildMPConfigFileContent(MP11ConfigSettings.PublicKeyNotSet, MP11ConfigSettings.ComplexPemFile,
                                                                                         mpConfigSettings.getIssuer()));
@@ -322,7 +318,8 @@ public class MPJwt11MPConfigTests extends MPJwtMPConfigTests {
                                                                buildMPConfigFileContent(MP11ConfigSettings.PublicKeyNotSet, "file:///" + fileLoc + "someKey.pem",
                                                                                         mpConfigSettings.getIssuer()));
             setupUtils.deployRSServerMPConfigInAppUnderWebInfApp(server, MpJwtFatConstants.BAD_RELATIVE_KEYLOCATION_IN_CONFIG_UNDER_WEB_INF_ROOT_CONTEXT,
-                                                                 buildMPConfigFileContent(MP11ConfigSettings.PublicKeyNotSet, "badPublicKeyLocation", mpConfigSettings.getIssuer()));
+                                                                 buildMPConfigFileContent(MP11ConfigSettings.PublicKeyNotSet, "badPublicKeyLocation",
+                                                                                          mpConfigSettings.getIssuer()));
 
         } catch (Exception e) {
             Log.info(thisClass, "MPJwtAltConfig", "Hit an exception updating the war file" + e.getMessage());
@@ -371,46 +368,6 @@ public class MPJwt11MPConfigTests extends MPJwtMPConfigTests {
         }
         Page response = actions.invokeUrlWithBearerToken(_testName, webClient, testUrl, builtToken);
         validationUtils.validateResult(response, expectations);
-
-    }
-
-    /**
-     * Set expectations for tests that have bad keyName/publicKey or jwksuri/keyLocations
-     *
-     * @param server - the server whose log we'll need to check for failure messages
-     * @param failureCause - the cause of the failure (failures that occur validating each type of cert x509/jwk)
-     * @return - an expectation object with a variety of errors to check for
-     * @throws Exception
-     */
-    public Expectations setBadCertExpectations(LibertyServer server, String failureCause) throws Exception {
-
-        Expectations expectations = new Expectations();
-        expectations.addExpectation(new ResponseStatusExpectation(HttpServletResponse.SC_UNAUTHORIZED));
-        expectations.addExpectation(new ServerMessageExpectation(server, MpJwtMessageConstants.CWWKS5523E_ERROR_CREATING_JWT_USING_TOKEN_IN_REQ, "Messages.log did not contain an error indicating a problem authenticating the request the provided token."));
-        switch (failureCause) {
-            case MpJwtFatConstants.X509_CERT:
-                String invalidKeyName = "badKeyName";
-                expectations.addExpectation(new ServerMessageExpectation(server, invalidKeyName
-                                                                                 + ".*is not present in the KeyStore as a certificate entry", "Messages.log did not contain a message stating that the alias was NOT found in the keystore."));
-                expectations.addExpectation(new ServerMessageExpectation(server, MpJwtMessageConstants.CWWKS6007E_BAD_KEY_ALIAS + ".*"
-                                                                                 + invalidKeyName, "Messages.log did not indicate that the signing key is NOT available."));
-                expectations.addExpectation(new ServerMessageExpectation(server, MpJwtMessageConstants.CWWKS6033E_JWT_CONSUMER_PUBLIC_KEY_NOT_RETRIEVED + ".*"
-                                                                                 + invalidKeyName, "Message log did not indicate that the signing key is NOT available."));
-                break;
-            case MpJwtFatConstants.JWK_CERT:
-                expectations.addExpectation(new ServerMessageExpectation(server, MpJwtMessageConstants.CWWKS6029E_SIGNING_KEY_CANNOT_BE_FOUND, "Messages.log did not contain an error indicating that a signing key could not be found."));
-                break;
-            case BadKey:
-                expectations.addExpectation(new ServerMessageExpectation(server, MpJwtMessageConstants.CWWKS6029E_SIGNING_KEY_CANNOT_BE_FOUND, "Messages.log did not contain an error indicating that a signing key could not be found."));
-                break;
-            case KeyMismatch:
-                expectations.addExpectation(new ServerMessageExpectation(server, MpJwtMessageConstants.CWWKS6028E_SIG_ALG_MISMATCH, "Messages.log did not contain an error indicating that there was a mismatch in the signing keys."));
-                break;
-            default:
-                break;
-        }
-
-        return expectations;
 
     }
 

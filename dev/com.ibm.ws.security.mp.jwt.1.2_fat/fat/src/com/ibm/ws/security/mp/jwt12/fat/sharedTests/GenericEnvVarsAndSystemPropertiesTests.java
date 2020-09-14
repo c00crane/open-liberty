@@ -36,21 +36,23 @@ public class GenericEnvVarsAndSystemPropertiesTests extends MPJwt12MPConfigTests
 
     public static LibertyServer resourceServer;
 
-    private static String headerValue = MpJwt12FatConstants.AUTHORIZATION;
+    protected static String headerValue = MpJwt12FatConstants.AUTHORIZATION;
     protected static String cookieName = MpJwt12FatConstants.TOKEN_TYPE_BEARER;
+    protected static String sigAlgorithm = MpJwt12FatConstants.SIGALG_RS256;
     // don't need an audience instance as we don't need that info when we build the app request
 
-    @SuppressWarnings("restriction")
-    public static void commonSetup(LibertyServer requestedServer, String config, String header, String name, String audience, MPConfigLocation where) throws Exception {
+    public static void commonMpJwt12Setup(LibertyServer requestedServer, String config, String header, String name, String audience, String algorithm,
+                                          MPConfigLocation where) throws Exception {
 
         resourceServer = requestedServer;
 
         headerValue = header;
         cookieName = name;
+        sigAlgorithm = algorithm;
 
         setUpAndStartBuilderServer(jwtBuilderServer, "server_using_buildApp.xml");
 
-        MP12ConfigSettings mpConfigSettings = new MP12ConfigSettings(MP12ConfigSettings.PublicKeyLocationNotSet, MP12ConfigSettings.PublicKeyNotSet, MP12ConfigSettings.IssuerNotSet, MpJwt12FatConstants.X509_CERT, header, name, audience);
+        MP12ConfigSettings mpConfigSettings = new MP12ConfigSettings(MP12ConfigSettings.PublicKeyLocationNotSet, MP12ConfigSettings.PublicKeyNotSet, MP12ConfigSettings.IssuerNotSet, MpJwt12FatConstants.X509_CERT, header, name, audience, algorithm);
         setUpAndStartRSServerForTests(resourceServer, config, mpConfigSettings, where);
         // don't restore servers between test cases
         skipRestoreServerTracker.addServer(resourceServer);
@@ -67,8 +69,9 @@ public class GenericEnvVarsAndSystemPropertiesTests extends MPJwt12MPConfigTests
      */
     public void genericGoodTest() throws Exception {
 
-        resourceServer.restoreServerConfiguration(); // this test case wants the original server config
-        standardTestFlow(resourceServer, MpJwt12FatConstants.NO_MP_CONFIG_IN_APP_ROOT_CONTEXT,
+        resourceServer.restoreServerConfigurationAndWaitForApps();
+        // the builder we'll use has the same name as the signature algorithm
+        standardTestFlow(sigAlgorithm, resourceServer, MpJwt12FatConstants.NO_MP_CONFIG_IN_APP_ROOT_CONTEXT,
                          MpJwt12FatConstants.NO_MP_CONFIG_IN_APP_APP, MpJwt12FatConstants.MPJWT_APP_CLASS_NO_MP_CONFIG_IN_APP, headerValue,
                          cookieName);
 
@@ -77,7 +80,8 @@ public class GenericEnvVarsAndSystemPropertiesTests extends MPJwt12MPConfigTests
     public void genericBadTest(String config, Expectations expectations) throws Exception {
 
         resourceServer.reconfigureServerUsingExpandedConfiguration(_testName, config);
-        standardTestFlow(resourceServer, MpJwt12FatConstants.NO_MP_CONFIG_IN_APP_ROOT_CONTEXT,
+        // the builder we'll use has the same name as the signature algorithm
+        standardTestFlow(sigAlgorithm, resourceServer, MpJwt12FatConstants.NO_MP_CONFIG_IN_APP_ROOT_CONTEXT,
                          MpJwt12FatConstants.NO_MP_CONFIG_IN_APP_APP, MpJwt12FatConstants.MPJWT_APP_CLASS_NO_MP_CONFIG_IN_APP, headerValue,
                          cookieName, expectations);
 

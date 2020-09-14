@@ -15,6 +15,7 @@ import org.junit.Test;
 
 import com.ibm.ws.security.fat.common.expectations.Expectations;
 import com.ibm.ws.security.jwt.fat.mpjwt.MpJwt12FatConstants;
+import com.ibm.ws.security.jwt.fat.mpjwt.MpJwtFatConstants;
 import com.ibm.ws.security.mp.jwt12.fat.sharedTests.MPJwt12MPConfigTests;
 import com.ibm.ws.security.mp.jwt12.fat.utils.MP12ConfigSettings;
 
@@ -41,7 +42,7 @@ public class MPJwt12MPConfigInApp_Tests extends MPJwt12MPConfigTests {
 
     public static Class<?> thisClass = MPJwt12MPConfigInApp_Tests.class;
 
-    @Server("com.ibm.ws.security.mp.jwt.fat")
+    @Server("com.ibm.ws.security.mp.jwt.1.2.fat")
     public static LibertyServer resourceServer;
 
     @BeforeClass
@@ -50,8 +51,9 @@ public class MPJwt12MPConfigInApp_Tests extends MPJwt12MPConfigTests {
         setUpAndStartBuilderServer(jwtBuilderServer, "server_using_buildApp.xml");
 
         // let's pick a default mp config - we'll allow most of the settings (mpJwt 1.1 attrs) to come from the server.xml
-        MP12ConfigSettings mpConfigSettings = new MP12ConfigSettings(MP12ConfigSettings.PublicKeyLocationNotSet, MP12ConfigSettings.PublicKeyNotSet, MP12ConfigSettings.IssuerNotSet, MpJwt12FatConstants.X509_CERT, MP12ConfigSettings.DefaultHeader, MP12ConfigSettings.DefaultCookieName, "client01, client02");
-        setupBootstrapPropertiesForMPTests(resourceServer, mpConfigSettings);
+        MP12ConfigSettings mpConfigSettings = new MP12ConfigSettings(MP12ConfigSettings.PublicKeyLocationNotSet, MP12ConfigSettings.PublicKeyNotSet, MP12ConfigSettings.IssuerNotSet, MpJwt12FatConstants.X509_CERT, MP12ConfigSettings.DefaultHeader, MP12ConfigSettings.DefaultCookieName, "client01, client02", MP12ConfigSettings.AlgorithmNotSet);
+
+        setupBootstrapPropertiesForMPTests(resourceServer, MP12ConfigSettings.jwksUri, mpConfigSettings.getCertType().equals(MpJwtFatConstants.JWK_CERT));
 
         deployRSServerMPConfigInAppHeaderApps(resourceServer, mpConfigSettings);
 
@@ -61,7 +63,7 @@ public class MPJwt12MPConfigInApp_Tests extends MPJwt12MPConfigTests {
 
     /******************************************** tests **************************************/
 
-    /********************************* Header & Cookie tests *********************************/
+    /********************************* Start Header & Cookie tests *********************************/
     /* Simple negative tests like not passing a token at all are covered under the base config attribute tests */
 
     /**
@@ -251,7 +253,6 @@ public class MPJwt12MPConfigInApp_Tests extends MPJwt12MPConfigTests {
                          warningExpectations);
     }
 
-    /****************/
     /**
      * Test shows that we'll pick up the header setting from server.xml instead of mp config properties
      * The app has the header set to Authorization in META-INF - server.xml has it set to Cookie.
@@ -266,7 +267,6 @@ public class MPJwt12MPConfigInApp_Tests extends MPJwt12MPConfigTests {
         standardTestFlow(resourceServer, MpJwt12FatConstants.GOOD_HEADER_AUTHORIZATION_IN_CONFIG_IN_META_INF_ROOT_CONTEXT,
                          MpJwt12FatConstants.MP_CONFIG_IN_META_INF_TREE_APP, MpJwt12FatConstants.MPJWT_APP_CLASS_MP_CONFIG_IN_META_INF, MpJwt12FatConstants.AUTHORIZATION,
                          MpJwt12FatConstants.TOKEN_TYPE_BEARER, setMissingTokenExpectations(resourceServer));
-        // TODO fails this way
     }
 
     /**
@@ -349,12 +349,251 @@ public class MPJwt12MPConfigInApp_Tests extends MPJwt12MPConfigTests {
                          "OtherCookieName", setMissingTokenExpectations(resourceServer));
     }
 
-    /****************/
-// TODO - add audiences tests
-    /************************************ Audiences tests ************************************/
-    /******************************* Signature Algorithm tests *******************************/
-// TODO - add publickey.algorithm tests
+    /********************************* End Header & Cookie tests *********************************/
+
+    /************************************ Start Audiences tests ************************************/
+    /**
+     * Test shows that we'll pick up the audiences setting from mp config properties
+     * The app has audiences set to a valid value in META-INF.
+     * The test case passes a token with an audience value that matches what is in the mp config properites.
+     * (all of the non-Audience tests in this class are really testing with good Audiences values - just adding this test for completeness)
+     *
+     * @throws Exception
+     */
+    @Test
+    public void MPJwt12MPConfigInApp_NoMPJwt12ConfigInServerXml_GoodAudiencesInMPConfig_InMetaInf_test() throws Exception {
+
+        standardTestFlow(resourceServer, MpJwt12FatConstants.GOOD_AUDIENCES_IN_CONFIG_IN_META_INF_ROOT_CONTEXT,
+                         MpJwt12FatConstants.MP_CONFIG_IN_META_INF_TREE_APP, MpJwt12FatConstants.MPJWT_APP_CLASS_MP_CONFIG_IN_META_INF, MpJwt12FatConstants.AUTHORIZATION,
+                         MpJwt12FatConstants.TOKEN_TYPE_BEARER);
+    }
+
+    /**
+     * Test shows that we'll pick up the audiences setting from mp config properties
+     * The app has audiences set to a valid value under WEB-INF.
+     * The test case passes a token with an audience value that matches what is in the mp config properties.
+     * (all of the non-Audience tests in this class are really testing with good Audiences values - just adding this test for completeness)
+     *
+     * @throws Exception
+     */
+    @Test
+    public void MPJwt12MPConfigInApp_NoMPJwt12ConfigInServerXml_GoodAudiencesInMPConfig_UnderWebInf_test() throws Exception {
+
+        standardTestFlow(resourceServer, MpJwt12FatConstants.GOOD_AUDIENCES_IN_CONFIG_UNDER_WEB_INF_ROOT_CONTEXT,
+                         MpJwt12FatConstants.MP_CONFIG_UNDER_WEB_INF_TREE_APP, MpJwt12FatConstants.MPJWT_APP_CLASS_MP_CONFIG_UNDER_WEB_INF, MpJwt12FatConstants.AUTHORIZATION,
+                         MpJwt12FatConstants.TOKEN_TYPE_BEARER);
+    }
+
+    /**
+     * Test shows that we'll pick up the audiences setting from mp config properties
+     * The app has audiences set to an invalid value in META-INF.
+     * The test case passes a token with an audience value that does not match what is in the mp config properites.
+     *
+     * @throws Exception
+     */
+    @Test
+    public void MPJwt12MPConfigInApp_NoMPJwt12ConfigInServerXml_BadAudiencesInMPConfig_InMetaInf_test() throws Exception {
+
+        standardTestFlow(resourceServer, MpJwt12FatConstants.BAD_AUDIENCES_IN_CONFIG_IN_META_INF_ROOT_CONTEXT,
+                         MpJwt12FatConstants.MP_CONFIG_IN_META_INF_TREE_APP, MpJwt12FatConstants.MPJWT_APP_CLASS_MP_CONFIG_IN_META_INF, MpJwt12FatConstants.AUTHORIZATION,
+                         MpJwt12FatConstants.TOKEN_TYPE_BEARER, setBadAudiencesExpectations(resourceServer));
+    }
+
+    /**
+     * Test shows that we'll pick up the audiences setting from mp config properties
+     * The app has audiences set to an invalid value under WEB-INF.
+     * The test case passes a token with an audience value that does not match what is in the mp config properites.
+     *
+     * @throws Exception
+     */
+    @Test
+    public void MPJwt12MPConfigInApp_NoMPJwt12ConfigInServerXml_BadAudiencesInMPConfig_UnderWebInf_test() throws Exception {
+
+        standardTestFlow(resourceServer, MpJwt12FatConstants.BAD_AUDIENCES_IN_CONFIG_UNDER_WEB_INF_ROOT_CONTEXT,
+                         MpJwt12FatConstants.MP_CONFIG_UNDER_WEB_INF_TREE_APP, MpJwt12FatConstants.MPJWT_APP_CLASS_MP_CONFIG_UNDER_WEB_INF, MpJwt12FatConstants.AUTHORIZATION,
+                         MpJwt12FatConstants.TOKEN_TYPE_BEARER, setBadAudiencesExpectations(resourceServer));
+    }
+
+    /**
+     * Test shows that we'll pick up the audiences setting from mp config properties
+     * The app has audiences set to an invalid value in META-INF.
+     * The server.xml has a good audiences value - this will override the values in the mp config.
+     * The test case passes a token with an audience value that does not match what is in the mp config properites, but will match what's in the server.xml
+     *
+     * @throws Exception
+     */
+    @Test
+    public void MPJwt12MPConfigInApp_GoodAudiencesInServerXml_BadAudiencesInMPConfig_InMetaInf_test() throws Exception {
+
+        resourceServer.reconfigureServerUsingExpandedConfiguration(_testName, "rs_server_AltConfigInApp_Good_Audiences.xml");
+        standardTestFlow(resourceServer, MpJwt12FatConstants.BAD_AUDIENCES_IN_CONFIG_IN_META_INF_ROOT_CONTEXT,
+                         MpJwt12FatConstants.MP_CONFIG_IN_META_INF_TREE_APP, MpJwt12FatConstants.MPJWT_APP_CLASS_MP_CONFIG_IN_META_INF, MpJwt12FatConstants.AUTHORIZATION,
+                         MpJwt12FatConstants.TOKEN_TYPE_BEARER);
+    }
+
+    /**
+     * Test shows that we'll pick up the audiences setting from mp config properties
+     * The app has audiences set to an invalid value under WEB-INF.
+     * The server.xml has a good audiences value - this will override the values in the mp config.
+     * The test case passes a token with an audience value that does not match what is in the mp config properites, but will match what's in the server.xml
+     *
+     * @throws Exception
+     */
+    @Test
+    public void MPJwt12MPConfigInApp_GoodAudiencesInServerXml_BadAudiencesInMPConfig_UnderWebInf_test() throws Exception {
+
+        resourceServer.reconfigureServerUsingExpandedConfiguration(_testName, "rs_server_AltConfigInApp_Good_Audiences.xml");
+        standardTestFlow(resourceServer, MpJwt12FatConstants.BAD_AUDIENCES_IN_CONFIG_UNDER_WEB_INF_ROOT_CONTEXT,
+                         MpJwt12FatConstants.MP_CONFIG_UNDER_WEB_INF_TREE_APP, MpJwt12FatConstants.MPJWT_APP_CLASS_MP_CONFIG_UNDER_WEB_INF, MpJwt12FatConstants.AUTHORIZATION,
+                         MpJwt12FatConstants.TOKEN_TYPE_BEARER);
+    }
+
+    /******************************* End Audiences tests *******************************/
+
+    /******************************* Start Signature Algorithm tests *******************************/
+    /*
+     * NOTE: the mp.jwt.verify.publickey and mp.jwt.verify.publickey.location attributes were supported with mpJwt 1.1.
+     * We're adding mp.jwt.verify.publickey.algorithm as part of the mpJwt 1.2 support, so, we'll just test that.
+     * We need to make sure that we can pick up the values in the microprofile-config.properties file (and that
+     * a value specified in server.xml will over-ride it.
+     */
+    /**
+     * Test shows that we'll pick up the algorithm setting from mp config properties
+     * The app has algorithm set to a valid value in META-INF.
+     * The test case passes a token with an algorithm value that matches what is in the mp config properites.
+     * (all of the non-algorithm tests in this class are really testing with good algorithms values - just adding this test for completeness)
+     *
+     * @throws Exception
+     */
+    @Test
+    public void MPJwt12MPConfigInApp_NoMPJwt12ConfigInServerXml_GoodAlgorithmInMPConfig_InMetaInf_test() throws Exception {
+
+        standardTestFlow(resourceServer, MpJwt12FatConstants.GOOD_ALGORITHM_IN_CONFIG_IN_META_INF_ROOT_CONTEXT,
+                         MpJwt12FatConstants.MP_CONFIG_IN_META_INF_TREE_APP, MpJwt12FatConstants.MPJWT_APP_CLASS_MP_CONFIG_IN_META_INF, MpJwt12FatConstants.AUTHORIZATION,
+                         MpJwt12FatConstants.TOKEN_TYPE_BEARER);
+    }
+
+    /**
+     * Test shows that we'll pick up the algorithm setting from mp config properties
+     * The app has algorithm set to a valid value under WEB-INF.
+     * The test case passes a token with an algorithm value that matches what is in the mp config properties.
+     * (all of the non-algorithm tests in this class are really testing with good algorithm values - just adding this test for completeness)
+     *
+     * @throws Exception
+     */
+    @Test
+    public void MPJwt12MPConfigInApp_NoMPJwt12ConfigInServerXml_GoodAlgorithmInMPConfig_UnderWebInf_test() throws Exception {
+
+        standardTestFlow(resourceServer, MpJwt12FatConstants.GOOD_ALGORITHM_IN_CONFIG_UNDER_WEB_INF_ROOT_CONTEXT,
+                         MpJwt12FatConstants.MP_CONFIG_UNDER_WEB_INF_TREE_APP, MpJwt12FatConstants.MPJWT_APP_CLASS_MP_CONFIG_UNDER_WEB_INF, MpJwt12FatConstants.AUTHORIZATION,
+                         MpJwt12FatConstants.TOKEN_TYPE_BEARER);
+    }
+
+    /**
+     * Test shows that we'll pick up the algorithm setting from mp config properties
+     * The app has algorithm set to an invalid value in META-INF.
+     * The test case passes a token with an algorithm value that does not match what is in the mp config properites.
+     *
+     * @throws Exception
+     */
+    @Test
+    public void MPJwt12MPConfigInApp_NoMPJwt12ConfigInServerXml_BadAlgorithmInMPConfig_InMetaInf_test() throws Exception {
+
+        standardTestFlow(resourceServer, MpJwt12FatConstants.BAD_ALGORITHM_IN_CONFIG_IN_META_INF_ROOT_CONTEXT,
+                         MpJwt12FatConstants.MP_CONFIG_IN_META_INF_TREE_APP, MpJwt12FatConstants.MPJWT_APP_CLASS_MP_CONFIG_IN_META_INF, MpJwt12FatConstants.AUTHORIZATION,
+                         MpJwt12FatConstants.TOKEN_TYPE_BEARER, setBadCertExpectations(resourceServer, KeyMismatch));
+    }
+
+    /**
+     * Test shows that we'll pick up the algorithm setting from mp config properties
+     * The app has algorithm set to an invalid value under WEB-INF.
+     * The test case passes a token with an algorithm value that does not match what is in the mp config properites.
+     *
+     * @throws Exception
+     */
+    @Test
+
+    public void MPJwt12MPConfigInApp_NoMPJwt12ConfigInServerXml_BadAlgorithmInMPConfig_UnderWebInf_test() throws Exception {
+
+        standardTestFlow(resourceServer, MpJwt12FatConstants.BAD_ALGORITHM_IN_CONFIG_UNDER_WEB_INF_ROOT_CONTEXT,
+                         MpJwt12FatConstants.MP_CONFIG_UNDER_WEB_INF_TREE_APP, MpJwt12FatConstants.MPJWT_APP_CLASS_MP_CONFIG_UNDER_WEB_INF, MpJwt12FatConstants.AUTHORIZATION,
+                         MpJwt12FatConstants.TOKEN_TYPE_BEARER, setBadCertExpectations(resourceServer, KeyMismatch));
+    }
+
+    /**
+     * Test shows that we'll pick up the algorithm setting from mp config properties
+     * The app has algorithm set to an invalid value in META-INF.
+     * The server.xml has a good algorithm value - this will override the values in the mp config.
+     * The test case passes a token with an algorithm value that does not match what is in the mp config properites, but will match what's in the server.xml
+     *
+     * @throws Exception
+     */
+    @Test
+    public void MPJwt12MPConfigInApp_GoodAlgorithmInServerXml_BadAlgorithmInMPConfig_InMetaInf_test() throws Exception {
+
+        resourceServer.reconfigureServerUsingExpandedConfiguration(_testName, "rs_server_AltConfigInApp_Good_Algorithm.xml");
+        standardTestFlow(resourceServer, MpJwt12FatConstants.BAD_ALGORITHM_IN_CONFIG_IN_META_INF_ROOT_CONTEXT,
+                         MpJwt12FatConstants.MP_CONFIG_IN_META_INF_TREE_APP, MpJwt12FatConstants.MPJWT_APP_CLASS_MP_CONFIG_IN_META_INF, MpJwt12FatConstants.AUTHORIZATION,
+                         MpJwt12FatConstants.TOKEN_TYPE_BEARER);
+    }
+
+    /**
+     * Test shows that we'll pick up the algorithm setting from mp config properties
+     * The app has algorithm set to an invalid value under WEB-INF.
+     * The server.xml has a good algorithm value - this will override the values in the mp config.
+     * The test case passes a token with an algorithm value that does not match what is in the mp config properites, but will match what's in the server.xml
+     *
+     * @throws Exception
+     */
+    @Test
+    public void MPJwt12MPConfigInApp_GoodAlgorithmInServerXml_BadAlgorithmInMPConfig_UnderWebInf_test() throws Exception {
+
+        resourceServer.reconfigureServerUsingExpandedConfiguration(_testName, "rs_server_AltConfigInApp_Good_Algorithm.xml");
+        standardTestFlow(resourceServer, MpJwt12FatConstants.BAD_ALGORITHM_IN_CONFIG_UNDER_WEB_INF_ROOT_CONTEXT,
+                         MpJwt12FatConstants.MP_CONFIG_UNDER_WEB_INF_TREE_APP, MpJwt12FatConstants.MPJWT_APP_CLASS_MP_CONFIG_UNDER_WEB_INF, MpJwt12FatConstants.AUTHORIZATION,
+                         MpJwt12FatConstants.TOKEN_TYPE_BEARER);
+    }
+
+    /**
+     * Test shows that we'll pick up the key and algorithm setting from mp config properties
+     * The app has the key and algorithm set to a valid NON-default value in META-INF.
+     * The server.xml does NOT have a key or algorithm defined, but does have an internal default for the algorithm - this test shows that the mp config will over-ride what's
+     * internal to the server.
+     * The test case needs to build a token using a different algorithm.
+     *
+     * @throws Exception
+     */
+    @Test
+    public void MPJwt12MPConfigInApp_GoodNonDefaultKeyAndAlgorithmInMPConfig_InMetaInf_test() throws Exception {
+
+        resourceServer.reconfigureServerUsingExpandedConfiguration(_testName, "rs_server_AltConfigInApp_No_Key_Algorithm.xml");
+        standardTestFlow(MpJwt12FatConstants.SIGALG_ES256, resourceServer, MpJwt12FatConstants.GOOD_KEY_AND_ALGORITHM_IN_CONFIG_IN_META_INF_ROOT_CONTEXT,
+                         MpJwt12FatConstants.MP_CONFIG_IN_META_INF_TREE_APP, MpJwt12FatConstants.MPJWT_APP_CLASS_MP_CONFIG_IN_META_INF, MpJwt12FatConstants.AUTHORIZATION,
+                         MpJwt12FatConstants.TOKEN_TYPE_BEARER);
+    }
+
+    /**
+     * Test shows that we'll pick up the key and algorithm setting from mp config properties
+     * The app has the key and algorithm set to a valid NON-default value under WEB-INF.
+     * The server.xml does NOT have a key or algorithm defined, but does have an internal default for the algorithm - this test shows that the mp config will over-ride what's
+     * internal to the server.
+     * The test case needs to build a token using a different algorithm.
+     *
+     * @throws Exception
+     */
+    @Test
+    public void MPJwt12MPConfigInApp_GoodNonDefaultKeyAndAlgorithmInMPConfig_UnderWebInf_test() throws Exception {
+
+        resourceServer.reconfigureServerUsingExpandedConfiguration(_testName, "rs_server_AltConfigInApp_No_Key_Algorithm.xml");
+        standardTestFlow(MpJwt12FatConstants.SIGALG_ES256, resourceServer, MpJwt12FatConstants.GOOD_KEY_AND_ALGORITHM_IN_CONFIG_UNDER_WEB_INF_ROOT_CONTEXT,
+                         MpJwt12FatConstants.MP_CONFIG_UNDER_WEB_INF_TREE_APP, MpJwt12FatConstants.MPJWT_APP_CLASS_MP_CONFIG_UNDER_WEB_INF, MpJwt12FatConstants.AUTHORIZATION,
+                         MpJwt12FatConstants.TOKEN_TYPE_BEARER);
+    }
+
+    /******************************* End Signature Algorithm tests *******************************/
+
 // TODO - add encryption tests
-    /*********************************** Encryption tests ************************************/
+    /******************************** Start Encryption tests **********************************/
+    /********************************* End Encryption tests ***********************************/
 
 }

@@ -16,7 +16,6 @@ import com.ibm.ws.security.fat.common.servers.ServerInstanceUtils;
 import com.ibm.ws.security.jwt.fat.mpjwt.MpJwtFatConstants;
 import com.ibm.ws.security.mp.jwt11.fat.utils.MP11ConfigSettings;
 
-import componenttest.annotation.Server;
 import componenttest.custom.junit.runner.FATRunner;
 import componenttest.topology.impl.LibertyServer;
 
@@ -35,24 +34,14 @@ import componenttest.topology.impl.LibertyServer;
 @RunWith(FATRunner.class)
 public class MPJwtWithGoodAltSigAlgMPConfig extends MPJwt11MPConfigTests {
 
-    @Server("com.ibm.ws.security.mp.jwt.1.1.fat")
-    public static LibertyServer envVarsResourceServer;
-    @Server("com.ibm.ws.security.mp.jwt.1.1.fat.jvmOptions")
-    public static LibertyServer sysPropResourceServer;
-
     public static LibertyServer resourceServer;
 
     private static String sigAlg = null;
     protected static final String JwksUriFlag = "jwksuri";
 
-    public static void commonSetup(String requestedSigAlg, String location, String key, MPConfigLocation where) throws Exception {
+    public static void commonSetup(LibertyServer requestedServer, String requestedSigAlg, String location, String key, MPConfigLocation where) throws Exception {
 
-        // decide which server we'll be using
-        if (where.equals(MPConfigLocation.ENV_VAR)) {
-            resourceServer = envVarsResourceServer;
-        } else {
-            resourceServer = sysPropResourceServer;
-        }
+        resourceServer = requestedServer;
 
         sigAlg = requestedSigAlg;
 

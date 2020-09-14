@@ -7,7 +7,7 @@
         		keyAlias="rsacert"
 				signatureAlgorithm="RS256"
 				/>
-				
+<!-- 				
 	<jwtBuilder id="HS256" 
 				audiences="client01, client02"
 				issuer="testIssuer"
@@ -112,7 +112,7 @@
 				keyAlias="ps512"
 				signatureAlgorithm="PS512"
 				/>		
-
+-->
 
 <!-- Builders that encrypt -->
 	<jwtBuilder id="HS256_enc_RS256" 

@@ -20,20 +20,25 @@ public class MP12ConfigSettings extends MP11ConfigSettings {
     public final static String HeaderNotSet = "";
     public final static String CookieNotSet = "";
     public final static String AudiencesNotSet = "";
+    public final static String DefaultAlgorithm = MpJwt12FatConstants.SIGALG_RS256;
+    public final static String AlgorithmNotSet = "";
 
     private String header = DefaultHeader;
     private String cookie = DefaultCookieName;
     private String audience = AudiencesNotSet;
+    private String algorithm = AlgorithmNotSet;
 
     public MP12ConfigSettings() {
     }
 
-    public MP12ConfigSettings(String inPublicKeyLocation, String inPublicKey, String inIssuer, String inCertType, String inHeader, String inCookie, String inAudience) {
+    public MP12ConfigSettings(String inPublicKeyLocation, String inPublicKey, String inIssuer, String inCertType, String inHeader, String inCookie, String inAudience,
+                              String inAlgorithm) {
 
         super(inPublicKeyLocation, inPublicKey, inIssuer, inCertType);
         header = inHeader;
         cookie = inCookie;
         audience = inAudience;
+        algorithm = inAlgorithm;
     }
 
     public void setHeader(String inHeader) {
@@ -58,5 +63,13 @@ public class MP12ConfigSettings extends MP11ConfigSettings {
 
     public String getAudience() {
         return audience;
+    }
+
+    public void setAlgorithm(String inAlgorithm) {
+        algorithm = inAlgorithm;
+    }
+
+    public String getAlgorithm() {
+        return algorithm;
     }
 }

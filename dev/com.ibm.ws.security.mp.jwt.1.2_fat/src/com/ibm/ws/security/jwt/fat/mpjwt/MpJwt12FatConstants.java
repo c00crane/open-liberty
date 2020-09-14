@@ -15,13 +15,16 @@ public class MpJwt12FatConstants extends MpJwtFatConstants {
     public static final String BAD_HEADER_IN_CONFIG_IN_META_INF_ROOT_CONTEXT = "microProfileBadHeaderInMP-ConfigInMETA-INF";
     public static final String BAD_HEADER_IN_CONFIG_UNDER_WEB_INF_ROOT_CONTEXT = "microProfileBadHeaderInMP-ConfigUnderWEB-INF";
 
-    public static final String GOOD_HEADER_IN_CONFIG_IN_META_INF_ROOT_CONTEXT = "microProfileGoodHeaderInMP-ConfigInMETA-INF";
-    public static final String GOOD_HEADER_IN_CONFIG_UNDER_WEB_INF_ROOT_CONTEXT = "microProfileGoodHeaderInMP-ConfigUnderWEB-INF";
-    public static final String GOOD_HEADER_ONLY_IN_CONFIG_IN_META_INF_ROOT_CONTEXT = "microProfileGoodHeaderOnlyInMP-ConfigInMETA-INF";
-    public static final String GOOD_HEADER_ONLY_IN_CONFIG_UNDER_WEB_INF_ROOT_CONTEXT = "microProfileGoodHeaderOnlyInMP-ConfigUnderWEB-INF";
-    public static final String BAD_HEADER_ONLY_IN_CONFIG_IN_META_INF_ROOT_CONTEXT = "microProfileBadHeaderOnlyInMP-ConfigInMETA-INF";
-    public static final String BAD_HEADER_ONLY_IN_CONFIG_UNDER_WEB_INF_ROOT_CONTEXT = "microProfileBadHeaderOnlyInMP-ConfigUnderWEB-INF";
-
     public static final String GOOD_AUDIENCES_IN_CONFIG_IN_META_INF_ROOT_CONTEXT = "microProfileGoodAudiencesInMP-ConfigInMETA-INF";
+    public static final String GOOD_AUDIENCES_IN_CONFIG_UNDER_WEB_INF_ROOT_CONTEXT = "microProfileGoodAudiencesInMP-ConfigUnderWEB-INF";
+    public static final String BAD_AUDIENCES_IN_CONFIG_IN_META_INF_ROOT_CONTEXT = "microProfileBadAudiencesInMP-ConfigInMETA-INF";
+    public static final String BAD_AUDIENCES_IN_CONFIG_UNDER_WEB_INF_ROOT_CONTEXT = "microProfileBadAudiencesInMP-ConfigUnderWEB-INF";
+
+    public static final String GOOD_ALGORITHM_IN_CONFIG_IN_META_INF_ROOT_CONTEXT = "microProfileGoodAlgorithmInMP-ConfigInMETA-INF";
+    public static final String GOOD_ALGORITHM_IN_CONFIG_UNDER_WEB_INF_ROOT_CONTEXT = "microProfileGoodAlgorithmInMP-ConfigUnderWEB-INF";
+    public static final String BAD_ALGORITHM_IN_CONFIG_IN_META_INF_ROOT_CONTEXT = "microProfileBadAlgorithmInMP-ConfigInMETA-INF";
+    public static final String BAD_ALGORITHM_IN_CONFIG_UNDER_WEB_INF_ROOT_CONTEXT = "microProfileBadAlgorithmInMP-ConfigUnderWEB-INF";
+    public static final String GOOD_KEY_AND_ALGORITHM_IN_CONFIG_IN_META_INF_ROOT_CONTEXT = "microProfileGoodKeyAndAlgorithmInMP-ConfigInMETA-INF";
+    public static final String GOOD_KEY_AND_ALGORITHM_IN_CONFIG_UNDER_WEB_INF_ROOT_CONTEXT = "microProfileGoodKeyAndAlgorithmInMP-ConfigUnderWEB-INF";
 
 }

@@ -3,6 +3,7 @@
 
 	<include location="${shared.config.dir}/jwtBuilderFeatures.xml" />
 
+	<include location="${shared.config.dir}/jwtBuilderSigAlgConfig.xml" />
 	<include location="${shared.config.dir}/jwt12BuilderClientBasicConfig.xml" />
 
 	<include location="${shared.config.dir}/goodBasicRegistry.xml" />

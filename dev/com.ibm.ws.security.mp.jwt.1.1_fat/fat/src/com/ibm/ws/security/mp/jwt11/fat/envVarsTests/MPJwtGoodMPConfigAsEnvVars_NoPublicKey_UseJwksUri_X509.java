@@ -43,7 +43,8 @@ public class MPJwtGoodMPConfigAsEnvVars_NoPublicKey_UseJwksUri_X509 extends MPJw
 
         setUpAndStartBuilderServer(jwtBuilderServer, "server_using_buildApp.xml");
 
-        MP11ConfigSettings mpConfigSettings = new MP11ConfigSettings(MP11ConfigSettings.jwksUri, MP11ConfigSettings.PublicKeyNotSet, MP11ConfigSettings.IssuerNotSet, MpJwtFatConstants.X509_CERT);
+        MP11ConfigSettings mpConfigSettings = new MP11ConfigSettings(MP11ConfigSettings.jwksUri, MP11ConfigSettings.PublicKeyNotSet, MP11ConfigSettings
+                        .buildDefaultIssuerString(jwtBuilderServer), MpJwtFatConstants.X509_CERT);
         setUpAndStartRSServerForTests(resourceServer, "rs_server_AltConfigNotInApp_noServerXmlConfig.xml", mpConfigSettings, MPConfigLocation.ENV_VAR);
 
     }

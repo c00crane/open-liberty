@@ -16,6 +16,7 @@ import org.junit.runner.RunWith;
 
 import com.ibm.ws.security.jwt.fat.mpjwt.MpJwt12FatConstants;
 import com.ibm.ws.security.mp.jwt12.fat.sharedTests.GenericEnvVarsAndSystemPropertiesTests;
+import com.ibm.ws.security.mp.jwt12.fat.utils.MP12ConfigSettings;
 
 import componenttest.annotation.Server;
 import componenttest.custom.junit.runner.FATRunner;
@@ -38,14 +39,14 @@ public class MPJwtGoodMP12ConfigAsSystemProperties_HeaderCookie extends GenericE
 
     public static Class<?> thisClass = MPJwtGoodMP12ConfigAsSystemProperties_HeaderCookie.class;
 
-    @Server("com.ibm.ws.security.mp.jwt.fat.jvmOptions")
+    @Server("com.ibm.ws.security.mp.jwt.1.2.fat.jvmOptions")
     public static LibertyServer sysPropResourceServer;
 
     @BeforeClass
     public static void setUp() throws Exception {
 
-        commonSetup(sysPropResourceServer, "rs_server_AltConfigNotInApp_good12ServerXmlConfigWithAudiences.xml", MpJwt12FatConstants.COOKIE, MpJwt12FatConstants.TOKEN_TYPE_BEARER,
-                    "client01, client02", MPConfigLocation.SYSTEM_VAR);
+        commonMpJwt12Setup(sysPropResourceServer, "rs_server_AltConfigNotInApp_good12ServerXmlConfigWithAudiences.xml", MpJwt12FatConstants.COOKIE,
+                           MpJwt12FatConstants.TOKEN_TYPE_BEARER, MP12ConfigSettings.AudiencesNotSet, MP12ConfigSettings.AlgorithmNotSet, MPConfigLocation.SYSTEM_PROP);
 
     }
 

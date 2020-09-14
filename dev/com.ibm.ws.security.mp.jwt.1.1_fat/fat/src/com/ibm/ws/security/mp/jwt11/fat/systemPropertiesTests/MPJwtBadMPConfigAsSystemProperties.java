@@ -51,7 +51,7 @@ public class MPJwtBadMPConfigAsSystemProperties extends MPJwt11MPConfigTests {
 
         MP11ConfigSettings mpConfigSettings = new MP11ConfigSettings("badKeyLocation", "badPublicKey", "badIssuer", MpJwtFatConstants.X509_CERT);
 
-        setUpAndStartRSServerForTests(resourceServer, "rs_server_AltConfigNotInApp_noServerXmlConfig.xml", mpConfigSettings, MPConfigLocation.SYSTEM_VAR);
+        setUpAndStartRSServerForTests(resourceServer, "rs_server_AltConfigNotInApp_noServerXmlConfig.xml", mpConfigSettings, MPConfigLocation.SYSTEM_PROP);
 
     }
 

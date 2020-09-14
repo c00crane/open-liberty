@@ -14,16 +14,19 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.junit.runner.RunWith;
 
 import com.ibm.ws.security.fat.common.expectations.Expectations;
 import com.ibm.ws.security.fat.common.expectations.ResponseFullExpectation;
+import com.ibm.ws.security.fat.common.expectations.ResponseStatusExpectation;
+import com.ibm.ws.security.fat.common.expectations.ServerMessageExpectation;
 import com.ibm.ws.security.fat.common.utils.CommonExpectations;
 import com.ibm.ws.security.fat.common.utils.SecurityFatHttpUtils;
 import com.ibm.ws.security.fat.common.validation.TestValidationUtils;
 import com.ibm.ws.security.jwt.fat.mpjwt.MpJwtFatConstants;
 import com.ibm.ws.security.mp.jwt11.fat.utils.CommonMpJwtFat;
-import com.ibm.ws.security.mp.jwt11.fat.utils.MP11ConfigSettings;
 import com.ibm.ws.security.mp.jwt11.fat.utils.MpJwtMessageConstants;
 
 import componenttest.custom.junit.runner.FATRunner;
@@ -51,7 +54,7 @@ public class MPJwtMPConfigTests extends CommonMpJwtFat {
     public static final String KeyMismatch = "KeyMismatch";
 
     public static enum MPConfigLocation {
-        IN_APP, SYSTEM_VAR, ENV_VAR
+        IN_APP, SYSTEM_PROP, ENV_VAR
     };
 
     @SuppressWarnings("serial")
@@ -64,12 +67,12 @@ public class MPJwtMPConfigTests extends CommonMpJwtFat {
 
     /******************************************** helper methods **************************************/
 
-    protected static void setupBootstrapPropertiesForMPTests(LibertyServer server, MP11ConfigSettings mpConfigSettings) throws Exception {
+    protected static void setupBootstrapPropertiesForMPTests(LibertyServer server, String jwksUri, boolean jwkEnabled) throws Exception {
         bootstrapUtils.writeBootstrapProperty(server, MpJwtFatConstants.BOOTSTRAP_PROP_FAT_SERVER_HOSTNAME, SecurityFatHttpUtils.getServerHostName());
         bootstrapUtils.writeBootstrapProperty(server, MpJwtFatConstants.BOOTSTRAP_PROP_FAT_SERVER_HOSTIP, SecurityFatHttpUtils.getServerHostIp());
-        if (mpConfigSettings.getCertType().equals(MpJwtFatConstants.JWK_CERT)) {
+        if (jwkEnabled) {
             bootstrapUtils.writeBootstrapProperty(server, "mpJwt_keyName", "");
-            bootstrapUtils.writeBootstrapProperty(server, "mpJwt_jwksUri", MP11ConfigSettings.jwksUri);
+            bootstrapUtils.writeBootstrapProperty(server, "mpJwt_jwksUri", jwksUri);
         } else {
             bootstrapUtils.writeBootstrapProperty(server, "mpJwt_keyName", "rsacert");
             bootstrapUtils.writeBootstrapProperty(server, "mpJwt_jwksUri", "");
@@ -131,6 +134,54 @@ public class MPJwtMPConfigTests extends CommonMpJwtFat {
     }
 
     /**
+     * Gets the resource server up and running.
+     * Sets properties in bootstrap.properties that will affect server behavior
+     * Sets up and installs the test apps
+     * Adds the server to the serverTracker (used for server restore and test class shutdown)
+     * Starts the server using the provided configuration file
+     * Saves the port info for this server (allows tests with multiple servers to know what ports each server uses)
+     * Allow some failure messages that occur during startup (they're ok and doing this prevents the test framework from failing)
+     *
+     * @param rs_server
+     *            - the server to process
+     * @param configFile
+     *            - the config file to start the server with
+     * @param jwkEnabled
+     *            - do we want jwk enabled (sets properties in bootstrap.properties that the configs will use)
+     * @throws Exception
+     */
+    protected static void setUpAndStartRSServerForApiTests(LibertyServer rs_server, LibertyServer builderServer, String configFile, boolean jwkEnabled) throws Exception {
+        setupBootstrapPropertiesForMPTests(rs_server, "\"" + SecurityFatHttpUtils.getServerSecureUrlBase(builderServer) + "jwt/ibm/api/defaultJWT/jwk\"", jwkEnabled);
+
+        bootstrapUtils.writeBootstrapProperty(rs_server, "mpJwt_authHeaderPrefix", MpJwtFatConstants.TOKEN_TYPE_BEARER + " ");
+
+        deployRSServerApiTestApps(rs_server);
+        serverTracker.addServer(rs_server);
+        rs_server.startServerUsingExpandedConfiguration(configFile, commonStartMsgs);
+        SecurityFatHttpUtils.saveServerPorts(rs_server, MpJwtFatConstants.BVT_SERVER_1_PORT_NAME_ROOT);
+        rs_server.addIgnoredErrors(Arrays.asList(MpJwtMessageConstants.CWWKW1001W_CDI_RESOURCE_SCOPE_MISMATCH));
+    }
+
+    /**
+     * Initialize the list of test application urls and their associated classNames
+     *
+     * @throws Exception
+     */
+    protected List<List<String>> getTestAppArray(LibertyServer server) throws Exception {
+
+        List<List<String>> testApps = new ArrayList<List<String>>();
+        testApps.add(Arrays.asList(buildAppUrl(server, MpJwtFatConstants.MICROPROFILE_SERVLET, MpJwtFatConstants.MPJWT_APP_SEC_CONTEXT_REQUEST_SCOPE),
+                                   MpJwtFatConstants.MPJWT_APP_CLASS_SEC_CONTEXT_REQUEST_SCOPE));
+        testApps.add(Arrays.asList(buildAppUrl(server, MpJwtFatConstants.MICROPROFILE_SERVLET, MpJwtFatConstants.MPJWT_APP_TOKEN_INJECT_REQUEST_SCOPE),
+                                   MpJwtFatConstants.MPJWT_APP_CLASS_TOKEN_INJECT_REQUEST_SCOPE));
+        testApps.add(Arrays.asList(buildAppUrl(server, MpJwtFatConstants.MICROPROFILE_SERVLET, MpJwtFatConstants.MPJWT_APP_CLAIM_INJECT_REQUEST_SCOPE),
+                                   MpJwtFatConstants.MPJWT_APP_CLASS_CLAIM_INJECT_REQUEST_SCOPE));
+
+        return testApps;
+
+    }
+
+    /**
      * Setup expectations for a valid/good path (we get to invoke the app). Expectations set status codes to check and content to
      * validate in the response from the app.
      *
@@ -149,4 +200,43 @@ public class MPJwtMPConfigTests extends CommonMpJwtFat {
         return expectations;
     }
 
+    /**
+     * Set expectations for tests that have bad keyName/publicKey or jwksuri/keyLocations
+     *
+     * @param server - the server whose log we'll need to check for failure messages
+     * @param failureCause - the cause of the failure (failures that occur validating each type of cert x509/jwk)
+     * @return - an expectation object with a variety of errors to check for
+     * @throws Exception
+     */
+    public Expectations setBadCertExpectations(LibertyServer server, String failureCause) throws Exception {
+
+        Expectations expectations = new Expectations();
+        expectations.addExpectation(new ResponseStatusExpectation(HttpServletResponse.SC_UNAUTHORIZED));
+        expectations.addExpectation(new ServerMessageExpectation(server, MpJwtMessageConstants.CWWKS5523E_ERROR_CREATING_JWT_USING_TOKEN_IN_REQ, "Messages.log did not contain an error indicating a problem authenticating the request the provided token."));
+        switch (failureCause) {
+            case MpJwtFatConstants.X509_CERT:
+                String invalidKeyName = "badKeyName";
+                expectations.addExpectation(new ServerMessageExpectation(server, invalidKeyName
+                                                                                 + ".*is not present in the KeyStore as a certificate entry", "Messages.log did not contain a message stating that the alias was NOT found in the keystore."));
+                expectations.addExpectation(new ServerMessageExpectation(server, MpJwtMessageConstants.CWWKS6007E_BAD_KEY_ALIAS + ".*"
+                                                                                 + invalidKeyName, "Messages.log did not indicate that the signing key is NOT available."));
+                expectations.addExpectation(new ServerMessageExpectation(server, MpJwtMessageConstants.CWWKS6033E_JWT_CONSUMER_PUBLIC_KEY_NOT_RETRIEVED + ".*"
+                                                                                 + invalidKeyName, "Message log did not indicate that the signing key is NOT available."));
+                break;
+            case MpJwtFatConstants.JWK_CERT:
+                expectations.addExpectation(new ServerMessageExpectation(server, MpJwtMessageConstants.CWWKS6029E_SIGNING_KEY_CANNOT_BE_FOUND, "Messages.log did not contain an error indicating that a signing key could not be found."));
+                break;
+            case BadKey:
+                expectations.addExpectation(new ServerMessageExpectation(server, MpJwtMessageConstants.CWWKS6029E_SIGNING_KEY_CANNOT_BE_FOUND, "Messages.log did not contain an error indicating that a signing key could not be found."));
+                break;
+            case KeyMismatch:
+                expectations.addExpectation(new ServerMessageExpectation(server, MpJwtMessageConstants.CWWKS6028E_SIG_ALG_MISMATCH, "Messages.log did not contain an error indicating that there was a mismatch in the signing keys."));
+                break;
+            default:
+                break;
+        }
+
+        return expectations;
+
+    }
 }

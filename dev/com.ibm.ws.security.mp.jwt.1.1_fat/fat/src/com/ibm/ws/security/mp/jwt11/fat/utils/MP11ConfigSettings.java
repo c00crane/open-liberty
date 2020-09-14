@@ -10,6 +10,8 @@
  *******************************************************************************/
 package com.ibm.ws.security.mp.jwt11.fat.utils;
 
+import java.net.InetAddress;
+
 import com.ibm.websphere.simplicity.log.Log;
 import com.ibm.ws.security.fat.common.utils.CommonIOUtils;
 import com.ibm.ws.security.jwt.fat.mpjwt.MpJwtFatConstants;
@@ -34,11 +36,11 @@ public class MP11ConfigSettings {
     public final static String jwksUri = "\"http://localhost:${bvt.prop.security_2_HTTP_default}/jwt/ibm/api/defaultJWT/jwk\"";
     public final static String PublicKeyNotSet = "";
     public final static String PublicKeyLocationNotSet = "";
-    public final static String IssuerNotSet = null;
+    public final static String IssuerNotSet = "";
 
     String publicKeyLocation = null;
     String publicKey = ComplexPublicKey;
-    String issuer = null;
+    String issuer = IssuerNotSet;
     String certType = MpJwtFatConstants.X509_CERT;
 
     /* key file names */
@@ -153,5 +155,18 @@ public class MP11ConfigSettings {
     public static String getDefaultKeyFileLoc(LibertyServer server) throws Exception {
 
         return server.getServerRoot() + "/";
+    }
+
+    public static String buildDefaultIssuerString(LibertyServer server) throws Exception {
+
+        InetAddress addr = InetAddress.getLocalHost();
+        String serverHostName = addr.getHostName();
+        String serverHostIp = addr.toString().split("/")[1];
+
+        return "testIssuer, http://" + serverHostName + ":" + server.getBvtPort()
+               + "/jwt/defaultJWT, http://" + serverHostIp + ":" + server.getBvtPort()
+               + "/jwt/defaultJWT, https://" + serverHostName + ":" + server.getBvtSecurePort()
+               + "/jwt/defaultJWT, https://" + serverHostIp + ":" + server.getBvtSecurePort() + "/jwt/defaultJWT";
+
     }
 }
