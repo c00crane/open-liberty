@@ -10,11 +10,13 @@
  *******************************************************************************/
 package com.ibm.ws.security.jwt.utils;
 
+import java.security.Key;
 import java.security.KeyStoreException;
-import java.security.PublicKey;
 import java.security.cert.CertificateException;
 
+import org.jose4j.jwe.ContentEncryptionAlgorithmIdentifiers;
 import org.jose4j.jwe.JsonWebEncryption;
+import org.jose4j.jwe.KeyManagementAlgorithmIdentifiers;
 
 import com.ibm.websphere.ras.Tr;
 import com.ibm.websphere.ras.TraceComponent;
@@ -22,6 +24,7 @@ import com.ibm.websphere.security.jwt.InvalidTokenException;
 import com.ibm.ws.ffdc.annotation.FFDCIgnore;
 import com.ibm.ws.security.common.jwk.impl.JwkKidBuilder;
 import com.ibm.ws.security.jwt.config.JwtConfig;
+import com.ibm.ws.security.jwt.internal.BuilderImpl;
 import com.ibm.ws.security.jwt.internal.JwtTokenException;
 
 public class JweSigner {
@@ -34,8 +37,9 @@ public class JweSigner {
         JwtConfig jwtConfig = jwtData.getConfig();
         try {
             JsonWebEncryption jwe = new JsonWebEncryption();
-            signer.setJweKeyData(jwe, jwtConfig, jwtData);
-            signer.setJweHeaders(jwe, jwtConfig);
+            BuilderImpl builder = jwtData.getBuilder();
+            signer.setJweKeyData(jwe, builder, jwtConfig);
+            signer.setJweHeaders(jwe, builder, jwtConfig);
             jwe.setPayload(jws);
             return signer.getJwtString(jwe);
         } catch (Exception e) {
@@ -44,8 +48,8 @@ public class JweSigner {
         }
     }
 
-    void setJweKeyData(JsonWebEncryption jwe, JwtConfig jwtConfig, JwtData jwtData) throws KeyStoreException, CertificateException, InvalidTokenException {
-        PublicKey keyManagementKey = getPublicKeyManagementKey(jwtConfig);
+    void setJweKeyData(JsonWebEncryption jwe, BuilderImpl builder, JwtConfig jwtConfig) throws KeyStoreException, CertificateException, InvalidTokenException {
+        Key keyManagementKey = getKeyManagementKey(builder, jwtConfig);
         if (keyManagementKey == null) {
             String errorMsg = Tr.formatMessage(tc, "KEY_MANAGEMENT_KEY_NOT_FOUND", new Object[] { jwtConfig.getId(), jwtConfig.getKeyManagementKeyAlias(), jwtConfig.getTrustStoreRef() });
             throw new KeyStoreException(errorMsg);
@@ -54,13 +58,21 @@ public class JweSigner {
         setJweKidHeader(jwe, keyManagementKey);
     }
 
-    PublicKey getPublicKeyManagementKey(JwtConfig jwtConfig) throws KeyStoreException, CertificateException, InvalidTokenException {
+    Key getKeyManagementKey(BuilderImpl builder, JwtConfig jwtConfig) throws KeyStoreException, CertificateException, InvalidTokenException {
+        Key keyManagementKey = builder.getKeyManagementKey();
+        if (keyManagementKey == null) {
+            keyManagementKey = getKeyManagementKeyFromTrustStore(jwtConfig);
+        }
+        return keyManagementKey;
+    }
+
+    Key getKeyManagementKeyFromTrustStore(JwtConfig jwtConfig) throws KeyStoreException, CertificateException, InvalidTokenException {
         String keyAlias = jwtConfig.getKeyManagementKeyAlias();
         String trustStoreRef = jwtConfig.getTrustStoreRef();
         return JwtUtils.getPublicKey(keyAlias, trustStoreRef);
     }
 
-    void setJweKidHeader(JsonWebEncryption jwe, PublicKey keyManagementKey) {
+    void setJweKidHeader(JsonWebEncryption jwe, Key keyManagementKey) {
         JwkKidBuilder kidbuilder = new JwkKidBuilder();
         String keyId = kidbuilder.buildKeyId(keyManagementKey);
         if (keyId != null) {
@@ -68,11 +80,49 @@ public class JweSigner {
         }
     }
 
-    void setJweHeaders(JsonWebEncryption jwe, JwtConfig jwtConfig) {
-        jwe.setAlgorithmHeaderValue(jwtConfig.getKeyManagementKeyAlgorithm());
-        jwe.setEncryptionMethodHeaderParameter(jwtConfig.getContentEncryptionAlgorithm());
-        jwe.setHeader("typ", "JWT");
+    void setJweHeaders(JsonWebEncryption jwe, BuilderImpl builder, JwtConfig jwtConfig) {
+        jwe.setAlgorithmHeaderValue(getKeyManagementKeyAlgorithm(builder, jwtConfig));
+        jwe.setEncryptionMethodHeaderParameter(getContentEncryptionAlgorithm(builder, jwtConfig));
+        jwe.setHeader("typ", "JOSE");
         jwe.setHeader("cty", "jwt");
+    }
+
+    String getKeyManagementKeyAlgorithm(BuilderImpl builder, JwtConfig jwtConfig) {
+        String keyManagementAlg = builder.getKeyManagementAlg();
+        if (keyManagementAlg == null) {
+            keyManagementAlg = getKeyManagementKeyAlgFromConfig(jwtConfig);
+        }
+        return keyManagementAlg;
+    }
+
+    String getKeyManagementKeyAlgFromConfig(JwtConfig jwtConfig) {
+        String configuredKeyManagementAlg = jwtConfig.getKeyManagementKeyAlgorithm();
+        if (configuredKeyManagementAlg == null) {
+            configuredKeyManagementAlg = KeyManagementAlgorithmIdentifiers.RSA_OAEP;
+            if (tc.isDebugEnabled()) {
+                Tr.debug(tc, "Key management algorithm not specified in server config. Defaulting to [" + configuredKeyManagementAlg + "]");
+            }
+        }
+        return configuredKeyManagementAlg;
+    }
+
+    String getContentEncryptionAlgorithm(BuilderImpl builder, JwtConfig jwtConfig) {
+        String contentEncryptionAlg = builder.getContentEncryptionAlg();
+        if (contentEncryptionAlg == null) {
+            contentEncryptionAlg = getContentEncryptionAlgorithmFromConfig(jwtConfig);
+        }
+        return contentEncryptionAlg;
+    }
+
+    String getContentEncryptionAlgorithmFromConfig(JwtConfig jwtConfig) {
+        String configuredContentEncryptionAlg = jwtConfig.getContentEncryptionAlgorithm();
+        if (configuredContentEncryptionAlg == null) {
+            configuredContentEncryptionAlg = ContentEncryptionAlgorithmIdentifiers.AES_256_GCM;
+            if (tc.isDebugEnabled()) {
+                Tr.debug(tc, "Content encryption algorithm not specified in server config. Defaulting to [" + configuredContentEncryptionAlg + "]");
+            }
+        }
+        return configuredContentEncryptionAlg;
     }
 
     String getJwtString(JsonWebEncryption jwe) throws JwtTokenException {
