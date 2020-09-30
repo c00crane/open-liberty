@@ -34,7 +34,7 @@ import com.ibm.ws.security.fat.common.expectations.ResponseUrlExpectation;
 import com.ibm.ws.security.fat.common.expectations.ServerMessageExpectation;
 import com.ibm.ws.security.fat.common.jwt.JwtMessageConstants;
 import com.ibm.ws.security.fat.common.jwt.PayloadConstants;
-import com.ibm.ws.security.fat.common.servers.ServerInstanceUtils;
+import com.ibm.ws.security.fat.common.jwt.servers.JwtServerInstanceUtils;
 import com.ibm.ws.security.fat.common.utils.CommonExpectations;
 import com.ibm.ws.security.fat.common.utils.CommonWaitForAppChecks;
 import com.ibm.ws.security.fat.common.utils.SecurityFatHttpUtils;
@@ -67,6 +67,7 @@ public class JwkEndpointValidationUrlTests extends CommonSecurityFat {
     public static LibertyServer rsServer;
     @ClassRule
     public static RepeatTests r = RepeatTests.withoutModification();
+    //    public static RepeatTests r = RepeatTests.with(new RunWithAndWithoutEncryption(false)).andWith(new RunWithAndWithoutEncryption(true));
 
     private static final JwtBuilderActions actions = new JwtBuilderActions();
     public static final BuilderTestValidationUtils validationUtils = new BuilderTestValidationUtils();
@@ -81,6 +82,15 @@ public class JwkEndpointValidationUrlTests extends CommonSecurityFat {
     @BeforeClass
     public static void setUp() throws Exception {
 
+        //        String extension = RepeatTestFilter.CURRENT_REPEAT_ACTION;
+        //        Log.info(thisClass, "setUp", "Current id is: " + extension);
+        //        if (extension.contains("WithEncryption")) {
+        //            JwtServerInstanceUtils.addEncryptionSettingToBootstrap(builderServer, true);
+        //            JwtServerInstanceUtils.addEncryptionSettingToBootstrap(rsServer, true);
+        //        } else {
+        //            JwtServerInstanceUtils.addEncryptionSettingToBootstrap(builderServer, false);
+        //            JwtServerInstanceUtils.addEncryptionSettingToBootstrap(rsServer, false);
+        //        }
         serverTracker.addServer(builderServer);
         builderServer.addInstalledAppForValidation(JWTBuilderConstants.JWT_BUILDER_SERVLET);
         builderServer.startServerUsingExpandedConfiguration("server_configTests.xml", CommonWaitForAppChecks.getSecurityReadyMsgs());
@@ -93,7 +103,7 @@ public class JwkEndpointValidationUrlTests extends CommonSecurityFat {
         // start server to run protected app - make sure we can use the JWT
         // Token that we produce
         serverTracker.addServer(rsServer);
-        ServerInstanceUtils.addHostNameAndAddrToBootstrap(rsServer);
+        JwtServerInstanceUtils.addHostNameAndAddrToBootstrap(rsServer);
         rsServer.addInstalledAppForValidation(JWTBuilderConstants.HELLOWORLD_APP);
         rsServer.startServerUsingExpandedConfiguration("rs_server_orig.xml", CommonWaitForAppChecks.getSecurityReadyMsgs());
         SecurityFatHttpUtils.saveServerPorts(rsServer, JWTBuilderConstants.BVT_SERVER_2_PORT_NAME_ROOT);

@@ -43,6 +43,7 @@ import com.ibm.websphere.security.jwt.JwtToken;
 import com.ibm.ws.security.fat.common.jwt.HeaderConstants;
 import com.ibm.ws.security.fat.common.jwt.PayloadConstants;
 import com.ibm.ws.security.fat.common.jwt.utils.JWTApiApplicationUtils;
+import com.ibm.ws.security.fat.common.utils.KeyTools;
 import com.ibm.ws.security.jwt.fat.builder.JWTBuilderConstants;
 
 /**
@@ -156,6 +157,7 @@ public class JwtBuilderSetApisClient extends HttpServlet {
         setSubject(pw, attrObject);
         setIssuer(pw, attrObject);
         setSignWith(pw, attrObject);
+        setEncryptWith(pw, attrObject);
 
         setClaims(pw, request.getParameter(JWTBuilderConstants.ADD_CLAIMS_AS), attrObject);
 
@@ -469,4 +471,28 @@ public class JwtBuilderSetApisClient extends HttpServlet {
         }
     }
 
+    /**
+     * invoke encryptWith method on the builder if any of the encryption parms are passed
+     * 
+     * @param pw
+     *            - print writer
+     * @param attrs
+     *            - the caller requested parms
+     * @throws Exception
+     */
+    protected void setEncryptWith(PrintWriter pw, JSONObject attrs) throws Exception {
+
+        String keyMgmtAlg = (String) attrs.get(JWTBuilderConstants.KEY_MGMT_ALG);
+        String encryptKeyString = (String) attrs.get(JWTBuilderConstants.ENCRYPT_KEY);
+        String contentEncryptAlg = (String) attrs.get(JWTBuilderConstants.CONTENT_ENCRYPT_ALG);
+
+        Key encryptKey = KeyTools.getPublicKeyFromPem(encryptKeyString);
+        // to allow calling test case to test all possible combinations of good/bad values passed to the encryptWith method,
+        //  allow caller to pass any subset of parms - we'll pass null for any missing
+        // this means that for positive tests, caller needs to pass values for all parms even the "defaults"
+        if (keyMgmtAlg != null || encryptKey != null || contentEncryptAlg != null) {
+            appUtils.logIt(pw, "Calling encryptWith with parms: keyManagementAlg=" + keyMgmtAlg + ", keyManagementKey=" + encryptKey + ", contentEncryptionAlg=" + contentEncryptAlg);
+            myJwtBuilder.encryptWith(keyMgmtAlg, encryptKey, contentEncryptAlg);
+        }
+    }
 }

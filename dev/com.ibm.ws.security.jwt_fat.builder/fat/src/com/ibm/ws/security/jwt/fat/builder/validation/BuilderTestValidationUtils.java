@@ -13,14 +13,20 @@ package com.ibm.ws.security.jwt.fat.builder.validation;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import javax.json.JsonObject;
+
 import org.apache.commons.codec.binary.Base64;
+import org.jose4j.jws.JsonWebSignature;
+import org.jose4j.jwx.JsonWebStructure;
 
 import com.gargoylesoftware.htmlunit.Page;
 import com.ibm.json.java.JSONArray;
 import com.ibm.json.java.JSONObject;
 import com.ibm.websphere.simplicity.log.Log;
+import com.ibm.ws.security.fat.common.jwt.JwtTokenForTest;
 import com.ibm.ws.security.fat.common.validation.TestValidationUtils;
 import com.ibm.ws.security.fat.common.web.WebResponseUtils;
+import com.ibm.ws.security.jwt.fat.builder.JWTBuilderConstants;
 
 public class BuilderTestValidationUtils extends TestValidationUtils {
 
@@ -132,4 +138,37 @@ public class BuilderTestValidationUtils extends TestValidationUtils {
         }
     }
 
+    public void validateEncryptedToken(String jwtTokenString, JSONObject testSettings) throws Exception {
+
+        String expectedKeyMgmtAlg = (String) testSettings.get(JWTBuilderConstants.KEY_MGMT_ALG);
+        String privateKey = (String) testSettings.get(JWTBuilderConstants.DECRYPT_KEY);
+        String expectedContentEncryptAlg = (String) testSettings.get(JWTBuilderConstants.CONTENT_ENCRYPT_ALG);
+
+        JsonWebStructure joseObject = JsonWebStructure.fromCompactSerialization(jwtTokenString);
+
+        if (joseObject instanceof JsonWebSignature) {
+            fail("Token is NOT encrypted");
+        }
+
+        JwtTokenForTest tokenForTest = new JwtTokenForTest(jwtTokenString, expectedKeyMgmtAlg, privateKey, expectedContentEncryptAlg);
+        JsonObject jweHeader = tokenForTest.getJsonJWEHeader();
+
+        if (jweHeader == null) {
+            fail("Token was not a proper JWE");
+        }
+        String keyMgmtAlg = jweHeader.getString("alg");
+        if (expectedKeyMgmtAlg == null) {
+            assertTrue("The actual key managmenet algorithm (" + keyMgmtAlg + ") did NOT match the expected key management algorithm (" + expectedKeyMgmtAlg + ")", expectedKeyMgmtAlg == keyMgmtAlg);
+        } else {
+            assertTrue("The actual key managmenet algorithm (" + keyMgmtAlg + ") did NOT match the expected key management algorithm (" + expectedKeyMgmtAlg + ")", expectedKeyMgmtAlg.equals(keyMgmtAlg));
+        }
+
+        String contentEncryptAlg = jweHeader.getString("enc");
+        if (expectedContentEncryptAlg == null) {
+            assertTrue("The actual key managmenet algorithm (" + contentEncryptAlg + ") did NOT match the expected key management algorithm (" + expectedContentEncryptAlg + ")", expectedContentEncryptAlg == contentEncryptAlg);
+        } else {
+            assertTrue("The actual key managmenet algorithm (" + contentEncryptAlg + ") did NOT match the expected key management algorithm (" + expectedContentEncryptAlg + ")", expectedContentEncryptAlg.equals(contentEncryptAlg));
+        }
+
+    }
 }

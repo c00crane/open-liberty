@@ -34,6 +34,8 @@ import componenttest.topology.impl.LibertyServer;
 
 public class CommonMpJwtFat extends CommonSecurityFat {
 
+    protected static Class<?> thisClass = CommonMpJwtFat.class;
+
     protected static ServerBootstrapUtils bootstrapUtils = new ServerBootstrapUtils();
     protected final MpJwtFatActions actions = new MpJwtFatActions();
     protected final static MpJwtAppSetupUtils setupUtils = new MpJwtAppSetupUtils();

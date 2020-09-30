@@ -57,4 +57,7 @@ public class JwtConstants extends Constants {
     public static final String NO_JWT_TOKEN = "No Token";
     public static final String JWT_MALFORMED_TOKEN_HEADER = "Header malformed: ";
     public static final String JWT_TOKEN_HEADER_JSON = "JSON Header: ";
+
+    public static final String BOOTSTRAP_PROP_ENCRYPTION_SETTING = "fat.server.encryption.setting";
+
 }

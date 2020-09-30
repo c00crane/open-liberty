@@ -1,6 +1,7 @@
 <server>
 
-	<sslDefault sslRef="DefaultSSLSettings" />
+	<!-- sslDefault sslRef="DefaultSSLSettings" / -->
+	<sslDefault sslRef="ssl_allSigAlg" />
 	<ssl
 		id="DefaultSSLSettings"
 		keyStoreRef="rsa_key"
