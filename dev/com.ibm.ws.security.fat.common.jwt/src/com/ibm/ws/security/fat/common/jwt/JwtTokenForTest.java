@@ -175,6 +175,9 @@ public class JwtTokenForTest {
     public void processJWE(String jwtTokenString, String expectedKeyMgmtAlg, String privateKey, String expectedContentEncryptAlg) throws Exception {
 
         Log.info(thisClass, "processJWE", "Original JWE Token String: " + jwtTokenString);
+//        Log.info(thisClass, "processJWE", "Key Management Key Alg: " + expectedKeyMgmtAlg);
+//        Log.info(thisClass, "processJWE", "Private Key: " + privateKey);
+//        Log.info(thisClass, "processJWE", "Content Encryption Alg: " + expectedContentEncryptAlg);
 
         // process the JWE Header
         String[] jwtParts = splitTokenString(jwtTokenString);

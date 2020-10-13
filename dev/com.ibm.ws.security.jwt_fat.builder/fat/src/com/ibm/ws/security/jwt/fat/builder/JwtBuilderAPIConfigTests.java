@@ -97,7 +97,7 @@ public class JwtBuilderAPIConfigTests extends CommonSecurityFat {
      * <LI>Should get a token built using the default values for the JWT Token
      * </OL>
      */
-    @Test
+    //chc@Test
     public void JwtBuilderAPIConfigTests_defaultConfig() throws Exception {
 
         JSONObject expectationSettings = BuilderHelpers.setDefaultClaims(builderServer);
@@ -125,7 +125,7 @@ public class JwtBuilderAPIConfigTests extends CommonSecurityFat {
      * </OL>
      */
     @Mode(TestMode.LITE)
-    @Test
+    //chc@Test
     public void JwtBuilderAPIConfigTests_noId() throws Exception {
 
         builderServer.reconfigureServerUsingExpandedConfiguration(_testName, "server_noId.xml");
@@ -154,7 +154,7 @@ public class JwtBuilderAPIConfigTests extends CommonSecurityFat {
      * <LI>Should get a token built using the default values for the JWT Token
      * </OL>
      */
-    @Test
+    //chc@Test
     public void JwtBuilderAPIConfigTests_emptyConfig() throws Exception {
 
         String builderId = "emptyConfig";
@@ -182,7 +182,7 @@ public class JwtBuilderAPIConfigTests extends CommonSecurityFat {
      * </UL>
      */
     @Mode(TestMode.LITE)
-    @Test
+    //chc@Test
     public void JwtBuilderAPIConfigTests_specificExpiry() throws Exception {
 
         String builderId = "specificExpiry";
@@ -214,7 +214,7 @@ public class JwtBuilderAPIConfigTests extends CommonSecurityFat {
      * </UL>
      */
     @Mode(TestMode.LITE)
-    @Test
+    //chc@Test
     public void JwtBuilderAPIConfigTests_specificExpiresInSeconds() throws Exception {
 
         String builderId = "specificExpirySeconds";
@@ -242,7 +242,7 @@ public class JwtBuilderAPIConfigTests extends CommonSecurityFat {
      * </UL>
      */
     @Mode(TestMode.LITE)
-    @Test
+    //chc@Test
     public void JwtBuilderAPIConfigTests_specificElapsedNotBefore() throws Exception {
 
         String builderId = "specificElapsedNBF";
@@ -272,7 +272,7 @@ public class JwtBuilderAPIConfigTests extends CommonSecurityFat {
      * </UL>
      */
     @Mode(TestMode.LITE)
-    @Test
+    //chc@Test
     public void JwtBuilderAPIConfigTests_specificAudiences() throws Exception {
 
         String builderId = "specificAudiences";
@@ -305,7 +305,7 @@ public class JwtBuilderAPIConfigTests extends CommonSecurityFat {
      * </UL>
      */
     @Mode(TestMode.LITE)
-    @Test
+    //chc@Test
     public void JwtBuilderAPIConfigTests_specificScopes() throws Exception {
 
         String builderId = "specificScopes";
@@ -337,7 +337,7 @@ public class JwtBuilderAPIConfigTests extends CommonSecurityFat {
      * </OL>
      */
     @Mode(TestMode.LITE)
-    @Test
+    //chc@Test
     public void JwtBuilderAPIConfigTests_specificJti() throws Exception {
 
         String builderId = "specificJti";
@@ -367,7 +367,7 @@ public class JwtBuilderAPIConfigTests extends CommonSecurityFat {
      * </OL>
      */
     @Mode(TestMode.LITE)
-    @Test
+    //chc@Test
     public void JwtBuilderAPIConfigTests_specificIssuer() throws Exception {
 
         String builderId = "specificIssuer";
@@ -397,7 +397,7 @@ public class JwtBuilderAPIConfigTests extends CommonSecurityFat {
      * @throws Exception
      */
     @Mode(TestMode.LITE)
-    @Test
+    //chc@Test
     public void JwtBuilderAPIConfigTests_amrValue_valid() throws Exception {
 
         String builderId = "AMRTestValid";
@@ -431,7 +431,7 @@ public class JwtBuilderAPIConfigTests extends CommonSecurityFat {
      * @throws Exception
      */
     @Mode(TestMode.LITE)
-    @Test
+    //chc@Test
     public void JwtBuilderAPIConfigTests_amrValue_invalid() throws Exception {
 
         String builderId = "AMRTestInvalid";
@@ -460,7 +460,7 @@ public class JwtBuilderAPIConfigTests extends CommonSecurityFat {
      * @throws Exception
      */
     @Mode(TestMode.LITE)
-    @Test
+    //chc@Test
     public void JwtBuilderAPIConfigTests_amrValue_empty() throws Exception {
 
         String builderId = "AMRTestEmpty";
@@ -493,7 +493,7 @@ public class JwtBuilderAPIConfigTests extends CommonSecurityFat {
      * <LI>Should get a token built using the one cert from the global keystore
      * </OL>
      */
-    @Test
+    //chc@Test
     public void JwtBuilderAPIConfigTests_sigAlg_RS256_goodGlobalKeyStore() throws Exception {
 
         String builderId = "key_sigAlg_RS256_noKeyRef";
@@ -522,7 +522,7 @@ public class JwtBuilderAPIConfigTests extends CommonSecurityFat {
      * keystore
      * </OL>
      */
-    @Test
+    //chc@Test
     public void JwtBuilderAPIConfigTests_sigAlg_RS256_goodGlobalKeyStore_goodKeyStoreRef_noKeyAlias() throws Exception {
 
         String builderId = "key_sigAlg_RS256";
@@ -552,7 +552,7 @@ public class JwtBuilderAPIConfigTests extends CommonSecurityFat {
      * </OL>
      */
     @Mode(TestMode.LITE)
-    @Test
+    //chc@Test
     public void JwtBuilderAPIConfigTests_sigAlg_RS256_goodGlobalKeyStore_goodKeyStoreRef_goodKeyAlias() throws Exception {
 
         String builderId = "key_sigAlg_RS256_goodKeyAlias";
@@ -581,7 +581,7 @@ public class JwtBuilderAPIConfigTests extends CommonSecurityFat {
      * </OL>
      */
     @ExpectedFFDC("com.ibm.ws.security.jwt.internal.JwtTokenException")
-    @Test
+    //chc@Test
     public void JwtBuilderAPIConfigTests_sigAlg_RS256_goodGlobalKeyStore_goodKeyStoreRef_badKeyAlias() throws Exception {
 
         String builderId = "key_sigAlg_RS256_badKeyAlias";
@@ -609,7 +609,7 @@ public class JwtBuilderAPIConfigTests extends CommonSecurityFat {
      * </OL>
      */
     @Mode(TestMode.LITE)
-    @Test
+    //chc@Test
     public void JwtBuilderAPIConfigTests_sigAlg_RS256_goodGlobalKeyStore_noKeyStoreRef_goodKeyAlias() throws Exception {
 
         String builderId = "key_sigAlg_RS256_goodKeyAlias_global";
@@ -645,7 +645,7 @@ public class JwtBuilderAPIConfigTests extends CommonSecurityFat {
      * <LI>This will actually build the token - we have no way of differentiating and RS256 from an RS384 or RS512 key...
      * </OL>
      */
-    @Test
+    //chc@Test
     public void JwtBuilderAPIConfigTests_sigAlg_RS256_goodGlobalKeyStore_goodKeyStoreRef_keyAliasMisMatchRS() throws Exception {
 
         String builderId = "key_sigAlg_RS256_badRSKeyAlias";
@@ -672,7 +672,7 @@ public class JwtBuilderAPIConfigTests extends CommonSecurityFat {
      * </OL>
      */
     @ExpectedFFDC("com.ibm.ws.security.jwt.internal.JwtTokenException")
-    @Test
+    //chc@Test
     public void JwtBuilderAPIConfigTests_sigAlg_RS256_goodGlobalKeyStore_goodKeyStoreRef_keyAliasMisMatchES() throws Exception {
 
         String builderId = "key_sigAlg_RS256_badESKeyAlias";
@@ -698,7 +698,7 @@ public class JwtBuilderAPIConfigTests extends CommonSecurityFat {
      * </OL>
      */
     @ExpectedFFDC("com.ibm.ws.security.jwt.internal.JwtTokenException")
-    @Test
+    //chc@Test
     public void JwtBuilderAPIConfigTests_sigAlg_RS256_goodGlobalKeyStore_goodKeyStoreRef_keyAliasMisMatchPS() throws Exception {
 
         String builderId = "key_sigAlg_RS256_badPSKeyAlias";
@@ -724,7 +724,7 @@ public class JwtBuilderAPIConfigTests extends CommonSecurityFat {
      * <LI>Should get a token built using the specified RS384 cert from the builder specific keystore
      * </OL>
      */
-    @Test
+    //chc@Test
     public void JwtBuilderAPIConfigTests_sigAlg_RS384_goodGlobalKeyStore_goodKeyStoreRef_goodKeyAlias() throws Exception {
 
         String builderId = "key_sigAlg_RS384_goodKeyAlias";
@@ -750,7 +750,7 @@ public class JwtBuilderAPIConfigTests extends CommonSecurityFat {
      * <LI>This will actually build the token - we have no way of differentiating and RS256 from an RS384 or RS512 key...
      * </OL>
      */
-    @Test
+    //chc@Test
     public void JwtBuilderAPIConfigTests_sigAlg_RS384_goodGlobalKeyStore_goodKeyStoreRef_keyAliasMisMatchRS() throws Exception {
 
         String builderId = "key_sigAlg_RS384_badRSKeyAlias";
@@ -777,7 +777,7 @@ public class JwtBuilderAPIConfigTests extends CommonSecurityFat {
      * </OL>
      */
     @ExpectedFFDC("com.ibm.ws.security.jwt.internal.JwtTokenException")
-    @Test
+    //chc@Test
     public void JwtBuilderAPIConfigTests_sigAlg_RS384_goodGlobalKeyStore_goodKeyStoreRef_keyAliasMisMatchES() throws Exception {
 
         String builderId = "key_sigAlg_RS384_badESKeyAlias";
@@ -803,7 +803,7 @@ public class JwtBuilderAPIConfigTests extends CommonSecurityFat {
      * </OL>
      */
     @ExpectedFFDC("com.ibm.ws.security.jwt.internal.JwtTokenException")
-    @Test
+    //chc@Test
     public void JwtBuilderAPIConfigTests_sigAlg_RS384_goodGlobalKeyStore_goodKeyStoreRef_keyAliasMisMatchPS() throws Exception {
 
         String builderId = "key_sigAlg_RS384_badPSKeyAlias";
@@ -829,7 +829,7 @@ public class JwtBuilderAPIConfigTests extends CommonSecurityFat {
      * <LI>Should get a token built using the specified RS512 cert from the builder specific keystore
      * </OL>
      */
-    @Test
+    //chc@Test
     public void JwtBuilderAPIConfigTests_sigAlg_RS512_goodGlobalKeyStore_goodKeyStoreRef_goodKeyAlias() throws Exception {
 
         String builderId = "key_sigAlg_RS512_goodKeyAlias";
@@ -855,7 +855,7 @@ public class JwtBuilderAPIConfigTests extends CommonSecurityFat {
      * <LI>This will actually build the token - we have no way of differentiating and RS256 from an RS384 or RS512 key...
      * </OL>
      */
-    @Test
+    //chc@Test
     public void JwtBuilderAPIConfigTests_sigAlg_RS512_goodGlobalKeyStore_goodKeyStoreRef_keyAliasMisMatchRS() throws Exception {
 
         String builderId = "key_sigAlg_RS512_badRSKeyAlias";
@@ -882,7 +882,7 @@ public class JwtBuilderAPIConfigTests extends CommonSecurityFat {
      * </OL>
      */
     @ExpectedFFDC("com.ibm.ws.security.jwt.internal.JwtTokenException")
-    @Test
+    //chc@Test
     public void JwtBuilderAPIConfigTests_sigAlg_RS512_goodGlobalKeyStore_goodKeyStoreRef_keyAliasMisMatchES() throws Exception {
 
         String builderId = "key_sigAlg_RS512_badESKeyAlias";
@@ -908,7 +908,7 @@ public class JwtBuilderAPIConfigTests extends CommonSecurityFat {
      * </OL>
      */
     @ExpectedFFDC("com.ibm.ws.security.jwt.internal.JwtTokenException")
-    @Test
+    //chc@Test
     public void JwtBuilderAPIConfigTests_sigAlg_RS512_goodGlobalKeyStore_goodKeyStoreRef_keyAliasMisMatchPS() throws Exception {
 
         String builderId = "key_sigAlg_RS512_badPSKeyAlias";
@@ -935,7 +935,7 @@ public class JwtBuilderAPIConfigTests extends CommonSecurityFat {
      * </OL>
      */
     @Mode(TestMode.LITE)
-    @Test
+    //chc@Test
     public void JwtBuilderAPIConfigTests_sigAlg_ES256_goodGlobalKeyStore_goodKeyStoreRef_goodKeyAlias() throws Exception {
 
         String builderId = "key_sigAlg_ES256_goodKeyAlias";
@@ -962,7 +962,7 @@ public class JwtBuilderAPIConfigTests extends CommonSecurityFat {
      * </OL>
      */
     @ExpectedFFDC("com.ibm.ws.security.jwt.internal.JwtTokenException")
-    @Test
+    //chc@Test
     public void JwtBuilderAPIConfigTests_sigAlg_ES256_goodGlobalKeyStore_goodKeyStoreRef_keyAliasMisMatchRS() throws Exception {
 
         String builderId = "key_sigAlg_ES256_badRSKeyAlias";
@@ -988,7 +988,7 @@ public class JwtBuilderAPIConfigTests extends CommonSecurityFat {
      * </OL>
      */
     @ExpectedFFDC("com.ibm.ws.security.jwt.internal.JwtTokenException")
-    @Test
+    //chc@Test
     public void JwtBuilderAPIConfigTests_sigAlg_ES256_goodGlobalKeyStore_goodKeyStoreRef_keyAliasMisMatchES() throws Exception {
 
         String builderId = "key_sigAlg_ES256_badESKeyAlias";
@@ -1014,7 +1014,7 @@ public class JwtBuilderAPIConfigTests extends CommonSecurityFat {
      * </OL>
      */
     @ExpectedFFDC("com.ibm.ws.security.jwt.internal.JwtTokenException")
-    @Test
+    //chc@Test
     public void JwtBuilderAPIConfigTests_sigAlg_ES256_goodGlobalKeyStore_goodKeyStoreRef_keyAliasMisMatchPS() throws Exception {
 
         String builderId = "key_sigAlg_ES256_badPSKeyAlias";
@@ -1040,7 +1040,7 @@ public class JwtBuilderAPIConfigTests extends CommonSecurityFat {
      * <LI>Should get a token built using the specified ES384 cert from the builder specific keystore
      * </OL>
      */
-    @Test
+    //chc@Test
     public void JwtBuilderAPIConfigTests_sigAlg_ES384_goodGlobalKeyStore_goodKeyStoreRef_goodKeyAlias() throws Exception {
 
         String builderId = "key_sigAlg_ES384_goodKeyAlias";
@@ -1067,7 +1067,7 @@ public class JwtBuilderAPIConfigTests extends CommonSecurityFat {
      * </OL>
      */
     @ExpectedFFDC("com.ibm.ws.security.jwt.internal.JwtTokenException")
-    @Test
+    //chc@Test
     public void JwtBuilderAPIConfigTests_sigAlg_ES384_goodGlobalKeyStore_goodKeyStoreRef_keyAliasMisMatchRS() throws Exception {
 
         String builderId = "key_sigAlg_ES384_badRSKeyAlias";
@@ -1093,7 +1093,7 @@ public class JwtBuilderAPIConfigTests extends CommonSecurityFat {
      * </OL>
      */
     @ExpectedFFDC("com.ibm.ws.security.jwt.internal.JwtTokenException")
-    @Test
+    //chc@Test
     public void JwtBuilderAPIConfigTests_sigAlg_ES384_goodGlobalKeyStore_goodKeyStoreRef_keyAliasMisMatchES() throws Exception {
 
         String builderId = "key_sigAlg_ES384_badESKeyAlias";
@@ -1119,7 +1119,7 @@ public class JwtBuilderAPIConfigTests extends CommonSecurityFat {
      * </OL>
      */
     @ExpectedFFDC("com.ibm.ws.security.jwt.internal.JwtTokenException")
-    @Test
+    //chc@Test
     public void JwtBuilderAPIConfigTests_sigAlg_ES384_goodGlobalKeyStore_goodKeyStoreRef_keyAliasMisMatchPS() throws Exception {
 
         String builderId = "key_sigAlg_ES384_badPSKeyAlias";
@@ -1146,7 +1146,7 @@ public class JwtBuilderAPIConfigTests extends CommonSecurityFat {
      * </OL>
      */
     @Mode(TestMode.LITE)
-    @Test
+    //chc@Test
     public void JwtBuilderAPIConfigTests_sigAlg_ES512_goodGlobalKeyStore_goodKeyStoreRef_goodKeyAlias() throws Exception {
 
         String builderId = "key_sigAlg_ES512_goodKeyAlias";
@@ -1173,7 +1173,7 @@ public class JwtBuilderAPIConfigTests extends CommonSecurityFat {
      * </OL>
      */
     @ExpectedFFDC("com.ibm.ws.security.jwt.internal.JwtTokenException")
-    @Test
+    //chc@Test
     public void JwtBuilderAPIConfigTests_sigAlg_ES512_goodGlobalKeyStore_goodKeyStoreRef_keyAliasMisMatchRS() throws Exception {
 
         String builderId = "key_sigAlg_ES512_badRSKeyAlias";
@@ -1199,7 +1199,7 @@ public class JwtBuilderAPIConfigTests extends CommonSecurityFat {
      * </OL>
      */
     @ExpectedFFDC("com.ibm.ws.security.jwt.internal.JwtTokenException")
-    @Test
+    //chc@Test
     public void JwtBuilderAPIConfigTests_sigAlg_ES512_goodGlobalKeyStore_goodKeyStoreRef_keyAliasMisMatchES() throws Exception {
 
         String builderId = "key_sigAlg_ES512_badESKeyAlias";
@@ -1225,7 +1225,7 @@ public class JwtBuilderAPIConfigTests extends CommonSecurityFat {
      * </OL>
      */
     @ExpectedFFDC("com.ibm.ws.security.jwt.internal.JwtTokenException")
-    @Test
+    //chc@Test
     public void JwtBuilderAPIConfigTests_sigAlg_ES512_goodGlobalKeyStore_goodKeyStoreRef_keyAliasMisMatchPS() throws Exception {
 
         String builderId = "key_sigAlg_ES512_badPSKeyAlias";
@@ -1251,7 +1251,7 @@ public class JwtBuilderAPIConfigTests extends CommonSecurityFat {
      * <LI>Should get a token built using the specified PS256 cert from the builder specific keystore
      * </OL>
      */
-    // TODO enable/update when PS algs are supported @Test
+    // TODO enable/update when PS algs are supported //chc@Test
     public void JwtBuilderAPIConfigTests_sigAlg_PS256_goodGlobalKeyStore_goodKeyStoreRef_goodKeyAlias() throws Exception {
 
         String builderId = "key_sigAlg_PS256_goodKeyAlias";
@@ -1285,7 +1285,7 @@ public class JwtBuilderAPIConfigTests extends CommonSecurityFat {
      * </OL>
      */
     @ExpectedFFDC("com.ibm.ws.security.jwt.internal.JwtTokenException")
-    // TODO enable/update when PS algs are supported@Test
+    // TODO enable/update when PS algs are supported//chc@Test
     public void JwtBuilderAPIConfigTests_sigAlg_PS256_goodGlobalKeyStore_goodKeyStoreRef_keyAliasMisMatchRS() throws Exception {
 
         String builderId = "key_sigAlg_PS256_badRSKeyAlias";
@@ -1311,7 +1311,7 @@ public class JwtBuilderAPIConfigTests extends CommonSecurityFat {
      * </OL>
      */
     @ExpectedFFDC("com.ibm.ws.security.jwt.internal.JwtTokenException")
-    // TODO enable/update when PS algs are supported@Test
+    // TODO enable/update when PS algs are supported//chc@Test
     public void JwtBuilderAPIConfigTests_sigAlg_PS256_goodGlobalKeyStore_goodKeyStoreRef_keyAliasMisMatchES() throws Exception {
 
         String builderId = "key_sigAlg_PS256_badESKeyAlias";
@@ -1337,7 +1337,7 @@ public class JwtBuilderAPIConfigTests extends CommonSecurityFat {
      * </OL>
      */
     @ExpectedFFDC("com.ibm.ws.security.jwt.internal.JwtTokenException")
-    // TODO enable/update when PS algs are supported@Test
+    // TODO enable/update when PS algs are supported//chc@Test
     public void JwtBuilderAPIConfigTests_sigAlg_PS256_goodGlobalKeyStore_goodKeyStoreRef_keyAliasMisMatchPS() throws Exception {
 
         String builderId = "key_sigAlg_PS256_badPSKeyAlias";
@@ -1363,7 +1363,7 @@ public class JwtBuilderAPIConfigTests extends CommonSecurityFat {
      * <LI>Should get a token built using the specified PS384 cert from the builder specific keystore
      * </OL>
      */
-    // TODO enable/update when PS algs are supported @Test
+    // TODO enable/update when PS algs are supported //chc@Test
     public void JwtBuilderAPIConfigTests_sigAlg_PS384_goodGlobalKeyStore_goodKeyStoreRef_goodKeyAlias() throws Exception {
 
         String builderId = "key_sigAlg_PS384_goodKeyAlias";
@@ -1397,7 +1397,7 @@ public class JwtBuilderAPIConfigTests extends CommonSecurityFat {
      * </OL>
      */
     @ExpectedFFDC("com.ibm.ws.security.jwt.internal.JwtTokenException")
-    // TODO enable/update when PS algs are supported @Test
+    // TODO enable/update when PS algs are supported //chc@Test
     public void JwtBuilderAPIConfigTests_sigAlg_PS384_goodGlobalKeyStore_goodKeyStoreRef_keyAliasMisMatchRS() throws Exception {
 
         String builderId = "key_sigAlg_PS384_badRSKeyAlias";
@@ -1423,7 +1423,7 @@ public class JwtBuilderAPIConfigTests extends CommonSecurityFat {
      * </OL>
      */
     @ExpectedFFDC("com.ibm.ws.security.jwt.internal.JwtTokenException")
-    // TODO enable/update when PS algs are supported @Test
+    // TODO enable/update when PS algs are supported //chc@Test
     public void JwtBuilderAPIConfigTests_sigAlg_PS384_goodGlobalKeyStore_goodKeyStoreRef_keyAliasMisMatchES() throws Exception {
 
         String builderId = "key_sigAlg_PS384_badESKeyAlias";
@@ -1449,7 +1449,7 @@ public class JwtBuilderAPIConfigTests extends CommonSecurityFat {
      * </OL>
      */
     @ExpectedFFDC("com.ibm.ws.security.jwt.internal.JwtTokenException")
-    // TODO enable/update when PS algs are supported @Test
+    // TODO enable/update when PS algs are supported //chc@Test
     public void JwtBuilderAPIConfigTests_sigAlg_PS384_goodGlobalKeyStore_goodKeyStoreRef_keyAliasMisMatchPS() throws Exception {
 
         String builderId = "key_sigAlg_PS384_badPSKeyAlias";
@@ -1475,7 +1475,7 @@ public class JwtBuilderAPIConfigTests extends CommonSecurityFat {
      * <LI>Should get a token built using the specified PS512 cert from the builder specific keystore
      * </OL>
      */
-    // TODO enable/update when PS algs are supported @Test
+    // TODO enable/update when PS algs are supported //chc@Test
     public void JwtBuilderAPIConfigTests_sigAlg_PS512_goodGlobalKeyStore_goodKeyStoreRef_goodKeyAlias() throws Exception {
 
         String builderId = "key_sigAlg_PS512_goodKeyAlias";
@@ -1509,7 +1509,7 @@ public class JwtBuilderAPIConfigTests extends CommonSecurityFat {
      * </OL>
      */
     @ExpectedFFDC("com.ibm.ws.security.jwt.internal.JwtTokenException")
-    // TODO enable/update when PS algs are supported @Test
+    // TODO enable/update when PS algs are supported //chc@Test
     public void JwtBuilderAPIConfigTests_sigAlg_PS512_goodGlobalKeyStore_goodKeyStoreRef_keyAliasMisMatchRS() throws Exception {
 
         String builderId = "key_sigAlg_PS512_badRSKeyAlias";
@@ -1535,7 +1535,7 @@ public class JwtBuilderAPIConfigTests extends CommonSecurityFat {
      * </OL>
      */
     @ExpectedFFDC("com.ibm.ws.security.jwt.internal.JwtTokenException")
-    // TODO enable/update when PS algs are supported @Test
+    // TODO enable/update when PS algs are supported //chc@Test
     public void JwtBuilderAPIConfigTests_sigAlg_PS512_goodGlobalKeyStore_goodKeyStoreRef_keyAliasMisMatchES() throws Exception {
 
         String builderId = "key_sigAlg_PS512_badESKeyAlias";
@@ -1561,7 +1561,7 @@ public class JwtBuilderAPIConfigTests extends CommonSecurityFat {
      * </OL>
      */
     @ExpectedFFDC("com.ibm.ws.security.jwt.internal.JwtTokenException")
-    // TODO enable/update when PS algs are supported @Test
+    // TODO enable/update when PS algs are supported //chc@Test
     public void JwtBuilderAPIConfigTests_sigAlg_PS512_goodGlobalKeyStore_goodKeyStoreRef_keyAliasMisMatchPS() throws Exception {
 
         String builderId = "key_sigAlg_PS512_badPSKeyAlias";
@@ -1588,7 +1588,7 @@ public class JwtBuilderAPIConfigTests extends CommonSecurityFat {
      * </OL>
      */
     @Mode(TestMode.LITE)
-    @Test
+    //chc@Test
     public void JwtBuilderAPIConfigTests_sigAlg_HS384_with_sharedKey() throws Exception {
 
         String builderId = "key_sigAlg_HS384_with_sharedKey";
@@ -1616,7 +1616,7 @@ public class JwtBuilderAPIConfigTests extends CommonSecurityFat {
      * </OL>
      */
     @Mode(TestMode.LITE)
-    @Test
+    //chc@Test
     public void JwtBuilderAPIConfigTests_sigAlg_HS512_with_sharedKey() throws Exception {
 
         String builderId = "key_sigAlg_HS512_with_sharedKey";
@@ -1649,7 +1649,7 @@ public class JwtBuilderAPIConfigTests extends CommonSecurityFat {
      * </OL>
      */
     @ExpectedFFDC("com.ibm.ws.security.jwt.internal.JwtTokenException")
-    @Test
+    //chc@Test
     public void JwtBuilderAPIConfigTests_sigAlg_RS256_goodGlobalKeyStore_noKeyStoreRef_badKeyAlias() throws Exception {
 
         String builderId = "key_sigAlg_RS256_badKeyAlias_global";
@@ -1676,7 +1676,7 @@ public class JwtBuilderAPIConfigTests extends CommonSecurityFat {
      * </OL>
      */
     @ExpectedFFDC("com.ibm.ws.security.jwt.internal.JwtTokenException")
-    @Test
+    //chc@Test
     public void JwtBuilderAPIConfigTests_sigAlg_RS256_goodGlobalKeyStore_badKeyStoreRef() throws Exception {
 
         String builderId = "key_sigAlg_RS256_badKeyStoreRef";
@@ -1703,7 +1703,7 @@ public class JwtBuilderAPIConfigTests extends CommonSecurityFat {
      * </OL>
      */
     @Mode(TestMode.LITE)
-    @Test
+    //chc@Test
     public void JwtBuilderAPIConfigTests_sigAlg_HS256_with_sharedKey() throws Exception {
 
         String builderId = "key_sigAlg_HS256_with_sharedKey";
@@ -1732,7 +1732,7 @@ public class JwtBuilderAPIConfigTests extends CommonSecurityFat {
      * </OL>
      */
     @Mode(TestMode.LITE)
-    @Test
+    //chc@Test
     public void JwtBuilderAPIConfigTests_sigAlg_HS256_with_xor_sharedKey() throws Exception {
 
         String builderId = "key_sigAlg_HS256_with_xor_sharedKey";
@@ -1761,7 +1761,7 @@ public class JwtBuilderAPIConfigTests extends CommonSecurityFat {
      * </OL>
      */
     @ExpectedFFDC("com.ibm.ws.security.jwt.internal.JwtTokenException")
-    @Test
+    //chc@Test
     public void JwtBuilderAPIConfigTests_sigAlg_HS256_without_sharedKey() throws Exception {
 
         String builderId = "key_sigAlg_HS256_without_sharedKey";
@@ -1786,7 +1786,7 @@ public class JwtBuilderAPIConfigTests extends CommonSecurityFat {
      * <LI>We will create a jwt token with a "kid" value
      * </OL>
      */
-    @Test
+    //chc@Test
     public void JwtBuilderAPIConfigTests_jwkEnabled_defaultValues() throws Exception {
 
         String builderId = "jwkEnabled";
@@ -1816,7 +1816,7 @@ public class JwtBuilderAPIConfigTests extends CommonSecurityFat {
      * </OL>
      */
     @Mode(TestMode.LITE)
-    @Test
+    //chc@Test
     public void JwtBuilderAPIConfigTests_jwkEnabled_sigAlg_RS256() throws Exception {
 
         String builderId = "jwkEnabled_RS256";
@@ -1848,7 +1848,7 @@ public class JwtBuilderAPIConfigTests extends CommonSecurityFat {
      * </OL>
      */
     @Mode(TestMode.LITE)
-    @Test
+    //chc@Test
     public void JwtBuilderAPIConfigTests_jwkEnabled_sigAlg_HS256() throws Exception {
 
         String builderId = "jwkEnabled_HS256";
@@ -1863,7 +1863,7 @@ public class JwtBuilderAPIConfigTests extends CommonSecurityFat {
 
     }
 
-    @Test
+    //chc@Test
     public void JwtBuilderAPIConfigTests_jwkEnabled_sigAlg_HS256_xor() throws Exception {
 
         String builderId = "jwkEnabled_HS256_xor";
@@ -1892,7 +1892,7 @@ public class JwtBuilderAPIConfigTests extends CommonSecurityFat {
      * <LI>We will create a jwt token with a signature length of 1024
      * </OL>
      */
-    @Test
+    //chc@Test
     public void JwtBuilderAPIConfigTests_jwkEnabled_jwkSigningKeySize_1024() throws Exception {
 
         String builderId = "jwkEnabled_size_1024";
@@ -1922,7 +1922,7 @@ public class JwtBuilderAPIConfigTests extends CommonSecurityFat {
      * <LI>We will create a jwt token with a signature length of 2048
      * </OL>
      */
-    @Test
+    //chc@Test
     public void JwtBuilderAPIConfigTests_jwkEnabled_jwkSigningKeySize_2048() throws Exception {
 
         String builderId = "jwkEnabled_size_2048";
@@ -1952,7 +1952,7 @@ public class JwtBuilderAPIConfigTests extends CommonSecurityFat {
      * <LI>We will create a jwt token with a signature length of 4096
      * </OL>
      */
-    @Test
+    //chc@Test
     public void JwtBuilderAPIConfigTests_jwkEnabled_jwkSigningKeySize_4096() throws Exception {
 
         String builderId = "jwkEnabled_size_4096";
@@ -2075,7 +2075,7 @@ public class JwtBuilderAPIConfigTests extends CommonSecurityFat {
      * the token will be validated)
      * </OL>
      */
-    //chc - need updated error handling @Test
+    @Test
     public void JwtBuilderAPIConfigTests_encryption_invalidKeyMgmtKeyAlg_goodRS256Alias_goodContentEncryptAlg() throws Exception {
 
         String builderId = "key_encrypt_bad_keyMgmtKey";
@@ -2108,7 +2108,7 @@ public class JwtBuilderAPIConfigTests extends CommonSecurityFat {
      * the token will be validated)
      * </OL>
      */
-    //chc - need updated error handling @Test
+    @Test
     public void JwtBuilderAPIConfigTests_encryption_missingKeyMgmtKeyAlg_goodRS256Alias_goodContentEncryptAlg() throws Exception {
 
         String builderId = "key_encrypt_missing_keyMgmtKey";
@@ -2140,7 +2140,8 @@ public class JwtBuilderAPIConfigTests extends CommonSecurityFat {
      * the token will be validated)
      * </OL>
      */
-    // chc - not allowing RSA-OAEP-256 at the moment @Test
+    // chc - not allowing RSA-OAEP-256 at the moment
+    @Test
     public void JwtBuilderAPIConfigTests_encryption_RSAOAEP256KeyMgmtKeyAlg_goodRS256Alias_goodContentEncryptAlg() throws Exception {
 
         String builderId = "key_encrypt_rsaOaep256_RS256";
@@ -2151,6 +2152,8 @@ public class JwtBuilderAPIConfigTests extends CommonSecurityFat {
         Page response = actions.invokeJwtBuilder_setApis(_testName, builderServer, builderId);
         validationUtils.validateResult(response, expectations);
 
+        // NOTE:  even though the config specifies RSA-OAEP-256 for the KeyMgmtKeyAlg, we'll only allow the default RSA-OAEP to be used in the config
+        // server startup will log a warning about the unsupported value and the config will use the default value (which is what we'll check for now)
         validationUtils.validateJWEToken(response, (String) expectationSettings.get(HeaderConstants.ALGORITHM), JwtKeyTools.getComplexPrivateKeyForSigAlg(builderServer, JWTBuilderConstants.SIGALG_RS256), (String) expectationSettings.get(HeaderConstants.ENCRYPTION));
 
     }
@@ -2172,7 +2175,7 @@ public class JwtBuilderAPIConfigTests extends CommonSecurityFat {
      * the token will be validated)
      * </OL>
      */
-    //chc - need updated error handling @Test
+    @Test
     public void JwtBuilderAPIConfigTests_encryption_goodKeyMgmtKeyAlg_goodRS256Alias_invalidContentEncryptAlg() throws Exception {
 
         String builderId = "key_encrypt_bad_contentEncryptAlg";
@@ -2204,7 +2207,7 @@ public class JwtBuilderAPIConfigTests extends CommonSecurityFat {
      * the token will be validated)
      * </OL>
      */
-    // - need updated error handling @Test
+    @Test
     public void JwtBuilderAPIConfigTests_encryption_goodKeyMgmtKeyAlg_goodRS256Alias_missingContentEncryptAlg() throws Exception {
 
         String builderId = "key_encrypt_missing_contentEncryptAlg";

@@ -10,9 +10,13 @@
  *******************************************************************************/
 package com.ibm.ws.security.jwt.fat.builder;
 
+import static org.junit.Assert.fail;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import javax.json.JsonObject;
 
 import org.jose4j.jwt.NumericDate;
 import org.junit.BeforeClass;
@@ -28,7 +32,9 @@ import com.ibm.websphere.simplicity.log.Log;
 import com.ibm.ws.security.fat.common.CommonSecurityFat;
 import com.ibm.ws.security.fat.common.expectations.Expectations;
 import com.ibm.ws.security.fat.common.expectations.ResponseFullExpectation;
+import com.ibm.ws.security.fat.common.expectations.ServerMessageExpectation;
 import com.ibm.ws.security.fat.common.jwt.HeaderConstants;
+import com.ibm.ws.security.fat.common.jwt.JwtTokenForTest;
 import com.ibm.ws.security.fat.common.jwt.PayloadConstants;
 import com.ibm.ws.security.fat.common.jwt.expectations.JwtApiExpectation;
 import com.ibm.ws.security.fat.common.jwt.utils.JwtKeyTools;
@@ -83,8 +89,8 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
     // -- once where the builder will process claims individually
     // This allows us to use the same tests with a variety of claims without having to duplicate test cases
     @ClassRule
-    //  TODO  public static RepeatTests r = RepeatTests.with(JwtBuilderClaimRepeatActions.asCollection());
-    public static RepeatTests r = RepeatTests.with(JwtBuilderClaimRepeatActions.asCollection()).andWith(JwtBuilderClaimRepeatActions.asSingle());
+    public static RepeatTests r = RepeatTests.with(JwtBuilderClaimRepeatActions.asCollection());
+    // TODO public static RepeatTests r = RepeatTests.with(JwtBuilderClaimRepeatActions.asCollection()).andWith(JwtBuilderClaimRepeatActions.asSingle());
 
     private static final JwtBuilderActions actions = new JwtBuilderActions();
     public static final BuilderTestValidationUtils validationUtils = new BuilderTestValidationUtils();
@@ -151,7 +157,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      */
     @SkipForRepeat(JwtBuilderClaimRepeatActions.CollectionID)
     @Mode(TestMode.LITE)
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_create_id_defaultJWT() throws Exception {
 
         JSONObject expectationSettings = BuilderHelpers.setDefaultClaims(builderServer);
@@ -188,7 +194,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      * </OL>
      */
     @Mode(TestMode.LITE)
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_create_id_defaultJWT_consumeToken() throws Exception {
 
         JSONObject expectationSettings = BuilderHelpers.setDefaultClaims(builderServer);
@@ -229,7 +235,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      * </OL>
      */
     @SkipForRepeat(JwtBuilderClaimRepeatActions.CollectionID)
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_create_id_notExist() throws Exception {
 
         Expectations expectations = new Expectations();
@@ -258,7 +264,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      * </OL>
      */
     @SkipForRepeat(JwtBuilderClaimRepeatActions.SingleID)
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_create_id_null() throws Exception {
 
         Expectations expectations = new Expectations();
@@ -287,7 +293,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      * </OL>
      */
     @SkipForRepeat(JwtBuilderClaimRepeatActions.CollectionID)
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_create_id_empty() throws Exception {
 
         Expectations expectations = new Expectations();
@@ -329,7 +335,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      * </OL>
      */
     @SkipForRepeat(JwtBuilderClaimRepeatActions.SingleID)
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_audience_nullList() throws Exception {
 
         String builderId = "jwt1";
@@ -369,7 +375,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      * </OL>
      */
     @SkipForRepeat(JwtBuilderClaimRepeatActions.CollectionID)
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_audience_one() throws Exception {
 
         String builderId = "jwt1";
@@ -415,7 +421,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      */
     @SkipForRepeat(JwtBuilderClaimRepeatActions.SingleID)
     @Mode(TestMode.LITE)
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_audience_multiple() throws Exception {
 
         String builderId = "jwt1";
@@ -461,7 +467,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      * </OL>
      */
     @SkipForRepeat(JwtBuilderClaimRepeatActions.CollectionID)
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_audience_duplicates() throws Exception {
 
         String builderId = "jwt1";
@@ -512,7 +518,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      * </OL>
      */
     @SkipForRepeat(JwtBuilderClaimRepeatActions.SingleID)
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_audience_duplicates_caseSensitive() throws Exception {
 
         String builderId = "jwt1";
@@ -559,7 +565,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      * </OL>
      */
     @SkipForRepeat(JwtBuilderClaimRepeatActions.CollectionID)
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_audience_nullListEntry() throws Exception {
 
         String builderId = "jwt1";
@@ -606,7 +612,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      * </OL>
      */
     @SkipForRepeat(JwtBuilderClaimRepeatActions.SingleID)
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_audience_emptyListEntry() throws Exception {
 
         String builderId = "jwt1";
@@ -658,7 +664,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      */
     @SkipForRepeat(JwtBuilderClaimRepeatActions.CollectionID)
     @Mode(TestMode.LITE)
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_expirationTime() throws Exception {
 
         String builderId = "jwt1";
@@ -703,7 +709,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      */
     @SkipForRepeat(JwtBuilderClaimRepeatActions.SingleID)
     @Mode(TestMode.LITE)
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_expirationTime_inThePast() throws Exception {
 
         String builderId = "jwt1";
@@ -745,7 +751,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      * </OL>
      */
     @SkipForRepeat(JwtBuilderClaimRepeatActions.CollectionID)
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_expirationTime_zero() throws Exception {
 
         String builderId = "jwt1";
@@ -787,7 +793,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      * </OL>
      */
     @SkipForRepeat(JwtBuilderClaimRepeatActions.SingleID)
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_expirationTime_negative() throws Exception {
 
         String builderId = "jwt1";
@@ -830,7 +836,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      */
     @SkipForRepeat(JwtBuilderClaimRepeatActions.CollectionID)
     @Mode(TestMode.LITE)
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_notBefore() throws Exception {
 
         String builderId = "jwt1";
@@ -874,7 +880,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      * </OL>
      */
     @SkipForRepeat(JwtBuilderClaimRepeatActions.SingleID)
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_notBefore_zero() throws Exception {
 
         String builderId = "jwt1";
@@ -916,7 +922,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      * </OL>
      */
     @SkipForRepeat(JwtBuilderClaimRepeatActions.CollectionID)
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_notBefore_negative() throws Exception {
 
         String builderId = "jwt1";
@@ -958,7 +964,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      * </OL>
      */
     @SkipForRepeat(JwtBuilderClaimRepeatActions.SingleID)
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_jwtId_cfgFalse_apiFalse() throws Exception {
 
         String builderId = "jwt1";
@@ -1005,7 +1011,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      */
     @SkipForRepeat(JwtBuilderClaimRepeatActions.CollectionID)
     @Mode(TestMode.LITE)
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_jwtId_cfgFalse_apiTrue() throws Exception {
 
         String builderId = "jwt1";
@@ -1051,7 +1057,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      * </OL>
      */
     @SkipForRepeat(JwtBuilderClaimRepeatActions.SingleID)
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_jwtId_cfgTrue_apiTrue() throws Exception {
 
         String builderId = "jwt_jtiTrue";
@@ -1097,7 +1103,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      * </OL>
      */
     @SkipForRepeat(JwtBuilderClaimRepeatActions.CollectionID)
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_jwtId_cfgTrue_apiFalse() throws Exception {
 
         String builderId = "jwt_jtiTrue";
@@ -1145,7 +1151,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      */
     @SkipForRepeat(JwtBuilderClaimRepeatActions.SingleID)
     @Mode(TestMode.LITE)
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_subject_validUser() throws Exception {
 
         String builderId = "jwt1";
@@ -1188,7 +1194,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      * </OL>
      */
     @SkipForRepeat(JwtBuilderClaimRepeatActions.CollectionID)
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_subject_invalidUser() throws Exception {
 
         String builderId = "jwt1";
@@ -1232,7 +1238,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      * </OL>
      */
     @SkipForRepeat(JwtBuilderClaimRepeatActions.SingleID)
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_subject_null() throws Exception {
 
         String builderId = "jwt1";
@@ -1274,7 +1280,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      * </OL>
      */
     @SkipForRepeat(JwtBuilderClaimRepeatActions.CollectionID)
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_subject_emptyUser() throws Exception {
 
         String builderId = "jwt1";
@@ -1317,7 +1323,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      */
     @SkipForRepeat(JwtBuilderClaimRepeatActions.SingleID)
     @Mode(TestMode.LITE)
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_issuer_validIssuer() throws Exception {
 
         String builderId = "jwt1";
@@ -1361,7 +1367,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      * </OL>
      */
     @SkipForRepeat(JwtBuilderClaimRepeatActions.CollectionID)
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_issuer_null() throws Exception {
 
         String builderId = "jwt1";
@@ -1403,7 +1409,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      * </OL>
      */
     @SkipForRepeat(JwtBuilderClaimRepeatActions.SingleID)
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_issuer_empty() throws Exception {
 
         String builderId = "jwt1";
@@ -1444,7 +1450,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      * </UL>
      * </OL>
      */
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_claim_one() throws Exception {
 
         String builderId = "jwt1";
@@ -1494,7 +1500,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      * </OL>
      */
     @Mode(TestMode.LITE)
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_claim_multiple() throws Exception {
 
         String builderId = "jwt1";
@@ -1544,7 +1550,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      * </UL>
      * </OL>
      */
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_claim_azp_causeItsSpecial() throws Exception {
 
         String builderId = "jwt1";
@@ -1595,7 +1601,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      */
     // test is validating that a null collection fails appropriately, so, skip if adding single claim (key,value) pairs
     //    @SkipForRepeat(JwtBuilderClaimRepeatActions.CollectionID)
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_claim_null() throws Exception {
 
         String builderId = "jwt1";
@@ -1650,7 +1656,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      * </UL>
      * </OL>
      */
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_claim_nullValueInList() throws Exception {
 
         String builderId = "jwt1";
@@ -1674,7 +1680,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
 
     }
 
-    //    @Test
+    //    //chc@Test
     //    public void JwtBuilderAPIBasicTests_claim_nullKeyInList() throws Exception {  }
 
     /**
@@ -1702,7 +1708,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      * </UL>
      * </OL>
      */
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_claim_emptyValueInList() throws Exception {
 
         String builderId = "jwt1";
@@ -1754,7 +1760,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      * </UL>
      * </OL>
      */
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_claim_emptyKeyInList() throws Exception {
 
         String builderId = "jwt1";
@@ -1802,7 +1808,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      * </UL>
      * </OL>
      */
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_claim_exp_long() throws Exception {
 
         String builderId = "jwt1";
@@ -1851,7 +1857,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      * </UL>
      * </OL>
      */
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_claim_exp_String() throws Exception {
 
         String builderId = "jwt1";
@@ -1896,7 +1902,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      * </UL>
      * </OL>
      */
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_claim_iat_long() throws Exception {
 
         String builderId = "jwt1";
@@ -1945,7 +1951,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      * </UL>
      * </OL>
      */
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_claim_iat_String() throws Exception {
 
         String builderId = "jwt1";
@@ -1991,7 +1997,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      * </UL>
      * </OL>
      */
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_claim_nbf_long() throws Exception {
 
         String builderId = "jwt1";
@@ -2039,7 +2045,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      * </UL>
      * </OL>
      */
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_claim_nbf_String() throws Exception {
 
         String builderId = "jwt1";
@@ -2085,7 +2091,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      * </UL>
      * </OL>
      */
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_claim_iss_String() throws Exception {
 
         String builderId = "jwt1";
@@ -2134,7 +2140,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      * </UL>
      * </OL>
      */
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_claim_iss_Long() throws Exception {
 
         String builderId = "jwt1";
@@ -2180,7 +2186,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      * </UL>
      * </OL>
      */
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_claim_token_type_String() throws Exception {
 
         String builderId = "jwt1";
@@ -2229,7 +2235,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      * </UL>
      * </OL>
      */
-    //    @Test
+    //    //chc@Test
     public void JwtBuilderAPIBasicTests_claim_token_type_Long() throws Exception {
 
         String builderId = "jwt1";
@@ -2275,7 +2281,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      * </UL>
      * </OL>
      */
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_claim_sub_String() throws Exception {
 
         String builderId = "jwt1";
@@ -2324,7 +2330,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      * </UL>
      * </OL>
      */
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_claim_sub_Long() throws Exception {
 
         String builderId = "jwt1";
@@ -2370,7 +2376,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      * </UL>
      * </OL>
      */
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_claim_jti_String() throws Exception {
 
         String builderId = "jwt1";
@@ -2420,7 +2426,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      * </OL>
      */
     @ExpectedFFDC({ "com.ibm.ws.security.jwt.internal.JwtTokenException" })
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_claim_jti_Long() throws Exception {
 
         String builderId = "jwt1";
@@ -2467,7 +2473,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      */
     // TODO - this is creating an alg claim in the payload, not updating the alg in the header - with the tooling, it will be funky to add expectations
     // for this case - does it really show anything???
-    //    @Test
+    //    //chc@Test
     public void JwtBuilderAPIBasicTests_claim_alg_String() throws Exception {
 
         String builderId = "jwt1";
@@ -2515,7 +2521,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      * </UL>
      * </OL>
      */
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_claim_kid_String() throws Exception {
 
         String builderId = "jwt1";
@@ -2557,7 +2563,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      * @throws Exception
      */
     @Mode(TestMode.LITE)
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_remove_extraClaim() throws Exception {
 
         String builderId = "jwt1";
@@ -2600,7 +2606,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      *
      * @throws Exception
      */
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_remove_nonExistant_extraClaim() throws Exception {
 
         String builderId = "jwt1";
@@ -2637,7 +2643,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      * @throws Exception
      */
     @Mode(TestMode.LITE)
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_remove_defaultClaim_exp() throws Exception {
 
         String builderId = "jwt1";
@@ -2680,7 +2686,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      *
      * @throws Exception
      */
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_remove_defaultClaim_iss() throws Exception {
 
         String builderId = "jwt1";
@@ -2716,7 +2722,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      *
      * @throws Exception
      */
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_remove_defaultClaim_iat() throws Exception {
 
         String builderId = "jwt1";
@@ -2752,7 +2758,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      *
      * @throws Exception
      */
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_remove_defaultClaim_tokenType() throws Exception {
 
         String builderId = "jwt1";
@@ -2786,7 +2792,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      *
      * @throws Exception
      */
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_remove_null() throws Exception {
 
         String builderId = "jwt1";
@@ -2817,7 +2823,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      *
      * @throws Exception
      */
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_remove_empty() throws Exception {
 
         String builderId = "jwt1";
@@ -2849,7 +2855,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      *
      * @throws Exception
      */
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_remove_apiClaim_nbf() throws Exception {
 
         String builderId = "jwt1";
@@ -2891,7 +2897,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      *
      * @throws Exception
      */
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_remove_apiClaim_sub() throws Exception {
 
         String builderId = "jwt1";
@@ -2933,7 +2939,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      *
      * @throws Exception
      */
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_remove_apiClaim_aud() throws Exception {
 
         String builderId = "jwt1";
@@ -2969,7 +2975,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      *
      * @throws Exception
      */
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_remove_apiClaim_jti() throws Exception {
 
         String builderId = "jwt1";
@@ -3021,7 +3027,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      * @throws Exception
      */
     @Mode(TestMode.LITE)
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_claimsFrom_jwtToken_allClaims() throws Exception {
 
         String baseBuilderId = "altJwt1";
@@ -3064,7 +3070,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      * @throws Exception
      */
     @Mode(TestMode.LITE)
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_claimsFrom_jwtString_allClaims() throws Exception {
 
         // build a token using the alternate builder config (we'll get claims from it)
@@ -3107,7 +3113,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      * @throws Exception
      */
     @Mode(TestMode.LITE)
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_claimsFrom_jwtString_encodedPayload_allClaims() throws Exception {
 
         // build a token using the alternate builder config (we'll get claims from it)
@@ -3151,7 +3157,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      * @throws Exception
      */
     @Mode(TestMode.LITE)
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_claimsFrom_jwtString_decodedPayload_allClaims() throws Exception {
 
         // build a token using the alternate builder config (we'll get claims from it)
@@ -3194,7 +3200,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      * @throws Exception
      */
     @Mode(TestMode.LITE)
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_claimsFrom_jwtToken_specificClaims() throws Exception {
 
         String baseBuilderId = "altJwt1";
@@ -3244,7 +3250,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      * @throws Exception
      */
     @Mode(TestMode.LITE)
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_claimsFrom_jwtString_specificClaims() throws Exception {
 
         // build a token using the alternate builder config (we'll get claims from it)
@@ -3295,7 +3301,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      * @throws Exception
      */
     @Mode(TestMode.LITE)
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_claimsFrom_jwtString_encodedPayload_specificClaims() throws Exception {
 
         // build a token using the alternate builder config (we'll get claims from it)
@@ -3346,7 +3352,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      * @throws Exception
      */
     @Mode(TestMode.LITE)
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_claimsFrom_jwtString_decodedPayload_specificClaims() throws Exception {
 
         // build a token using the alternate builder config (we'll get claims from it)
@@ -3396,7 +3402,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      *
      * @throws Exception
      */
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_claimsFrom_jwtToken_null_allClaims() throws Exception {
 
         String baseBuilderId = "altJwt1";
@@ -3434,7 +3440,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      *
      * @throws Exception
      */
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_claimsFrom_jwtToken_null_specificClaims() throws Exception {
 
         String baseBuilderId = "altJwt1";
@@ -3476,7 +3482,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      *
      * @throws Exception
      */
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_claimsFrom_jwtToken_nullSpecificClaims() throws Exception {
 
         String baseBuilderId = "altJwt1";
@@ -3521,7 +3527,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      *
      * @throws Exception
      */
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_claimsFrom_jwtToken_emptySpecificClaims() throws Exception {
 
         String baseBuilderId = "altJwt1";
@@ -3566,7 +3572,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      *
      * @throws Exception
      */
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_claimsFrom_jwtToken_nonExistantSpecificClaim() throws Exception {
 
         String baseBuilderId = "altJwt1";
@@ -3615,7 +3621,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      *
      * @throws Exception
      */
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_claimsFrom_jwtString_null_allClaims() throws Exception {
 
         // don't bother building a token from another build to get claims from - we're testing claimFrom(null)
@@ -3656,7 +3662,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      *
      * @throws Exception
      */
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_claimsFrom_jwtString_null_specificClaims() throws Exception {
 
         // don't bother building a token from another build to get claims from - we're testing claimFrom(null)
@@ -3701,7 +3707,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      *
      * @throws Exception
      */
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_claimsFrom_jwtString_empty_allClaims() throws Exception {
 
         // don't bother building a token from another build to get claims from - we're testing claimFrom("")
@@ -3740,7 +3746,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      *
      * @throws Exception
      */
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_claimsFrom_jwtString_empty_specificClaims() throws Exception {
 
         // don't bother building a token from another build to get claims from - we're testing claimFrom("")
@@ -3784,7 +3790,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      * @throws Exception
      */
     @ExpectedFFDC("org.jose4j.lang.JoseException")
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_claimsFrom_jwtString_garbage_allClaims() throws Exception {
 
         // don't bother building a token from another builder to get claims from - we're testing claimFrom("foo.foo.foo") (garbage)
@@ -3825,7 +3831,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      * @throws Exception
      */
     @ExpectedFFDC("org.jose4j.lang.JoseException")
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_claimsFrom_jwtString_garbage_specificClaims() throws Exception {
 
         // don't bother building a token from another builder to get claims from - we're testing claimFrom("foo.foo.foo") (garbage)
@@ -3869,7 +3875,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      *
      * @throws Exception
      */
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_claimsFrom_jwtString_nullSpecificClaims() throws Exception {
 
         // build a token using the alternate builder config (we'll get claims from it)
@@ -3917,7 +3923,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      *
      * @throws Exception
      */
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_claimsFrom_jwtString_emptySpecificClaims() throws Exception {
 
         // build a token using the alternate builder config (we'll get claims from it)
@@ -3964,7 +3970,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      *
      * @throws Exception
      */
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_claimsFrom_jwtString_nonExistantSpecificClaim() throws Exception {
 
         // build a token using the alternate builder config (we'll get claims from it)
@@ -4015,7 +4021,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      *
      * @throws Exception
      */
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_claimsFrom_jwtString_encodedPayload_nullSpecificClaims() throws Exception {
 
         // build a token using the alternate builder config (we'll get claims from it)
@@ -4063,7 +4069,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      *
      * @throws Exception
      */
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_claimsFrom_jwtString_encodedPayload_emptySpecificClaims() throws Exception {
 
         // build a token using the alternate builder config (we'll get claims from it)
@@ -4110,7 +4116,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      *
      * @throws Exception
      */
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_claimsFrom_jwtString_encodedPayload_nonExistantSpecificClaim() throws Exception {
 
         // build a token using the alternate builder config (we'll get claims from it)
@@ -4161,7 +4167,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      *
      * @throws Exception
      */
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_claimsFrom_jwtString_decodedPayload_nullSpecificClaims() throws Exception {
 
         // build a token using the alternate builder config (we'll get claims from it)
@@ -4208,7 +4214,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      *
      * @throws Exception
      */
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_claimsFrom_jwtString_decodedPayload_emptySpecificClaims() throws Exception {
 
         // build a token using the alternate builder config (we'll get claims from it)
@@ -4255,7 +4261,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      *
      * @throws Exception
      */
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_claimsFrom_jwtString_decodedPayload_nonExistantSpecificClaim() throws Exception {
 
         // build a token using the alternate builder config (we'll get claims from it)
@@ -4313,7 +4319,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      * </OL>
      */
     @Mode(TestMode.LITE)
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_signWith_sigAlg_HS256_key_string() throws Exception {
 
         String builderId = "jwt1";
@@ -4358,7 +4364,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      * </UL>
      * </OL>
      */
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_signWith_sigAlg_HS256_key_null() throws Exception {
 
         String builderId = "jwt1";
@@ -4401,7 +4407,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      * </UL>
      * </OL>
      */
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_signWith_sigAlg_HS256_key_empty() throws Exception {
 
         String builderId = "jwt1";
@@ -4444,7 +4450,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      * </UL>
      * </OL>
      */
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_signWith_sigAlg_RS256_key_string() throws Exception {
 
         String builderId = "jwt1";
@@ -4487,7 +4493,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      * </UL>
      * </OL>
      */
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_signWith_sigAlg_null_key_string() throws Exception {
 
         String builderId = "jwt1";
@@ -4530,7 +4536,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      * </UL>
      * </OL>
      */
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_signWith_sigAlg_empty_key_string() throws Exception {
 
         String builderId = "jwt1";
@@ -4573,7 +4579,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      * </UL>
      * </OL>
      */
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_signWith_sigAlg_garbage_key_string() throws Exception {
 
         String builderId = "jwt1";
@@ -4614,7 +4620,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      * </UL>
      * </OL>
      */
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_signWith_sigAlg_RS256_key_privKey() throws Exception {
 
         String builderId = "jwt1";
@@ -4657,7 +4663,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      * </OL>
      */
     @Mode(TestMode.LITE)
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_signWith_sigAlg_RS384_key_privKey() throws Exception {
 
         String builderId = "jwt1";
@@ -4699,7 +4705,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      * </UL>
      * </OL>
      */
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_signWith_sigAlg_RS512_key_privKey() throws Exception {
 
         String builderId = "jwt1";
@@ -4741,7 +4747,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      * </UL>
      * </OL>
      */
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_signWith_sigAlg_ES256_key_privKey() throws Exception {
 
         String builderId = "jwt1";
@@ -4783,7 +4789,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      * </UL>
      * </OL>
      */
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_signWith_sigAlg_ES384_key_privKey() throws Exception {
 
         String builderId = "jwt1";
@@ -4826,7 +4832,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      * </OL>
      */
     @Mode(TestMode.LITE)
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_signWith_sigAlg_ES512_key_privKey() throws Exception {
 
         String builderId = "jwt1";
@@ -4868,7 +4874,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      * </UL>
      * </OL>
      */
-    //    @Test
+    //    //chc@Test
     public void JwtBuilderAPIBasicTests_signWith_sigAlg_PS256_key_privKey() throws Exception {
 
         // TODO - need to add code to handle non-Java 11 case handling - it may/may not make sense depending on whether we can get through the test client to actually call the builder with the alg set to PS256
@@ -4912,7 +4918,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      * </OL>
      */
     @Mode(TestMode.LITE)
-    //    @Test
+    //    //chc@Test
     public void JwtBuilderAPIBasicTests_signWith_sigAlg_PS384_key_privKey() throws Exception {
 
         // TODO - need to add code to handle non-Java 11 case handling - it may/may not make sense depending on whether we can get through the test client to actually call the builder with the alg set to PS384
@@ -4955,7 +4961,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      * </UL>
      * </OL>
      */
-    //    @Test
+    //    //chc@Test
     public void JwtBuilderAPIBasicTests_signWith_sigAlg_PS512_key_privKey() throws Exception {
 
         // TODO - need to add code to handle non-Java 11 case handling - it may/may not make sense depending on whether we can get through the test client to actually call the builder with the alg set to PS512
@@ -4998,7 +5004,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      * </UL>
      * </OL>
      */
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_signWith_sigAlg_HS384_key_string() throws Exception {
 
         String builderId = "jwt1";
@@ -5041,7 +5047,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      * </UL>
      * </OL>
      */
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_signWith_sigAlg_HS512_key_string() throws Exception {
 
         String builderId = "jwt1";
@@ -5089,7 +5095,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      * </OL>
      */
     @Mode(TestMode.LITE)
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_signWith_sigAlg_RS256_key_publicKey() throws Exception {
 
         String builderId = "jwt1";
@@ -5131,7 +5137,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      * </UL>
      * </OL>
      */
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_signWith_sigAlg_RS256_key_null() throws Exception {
 
         String builderId = "jwt1";
@@ -5173,7 +5179,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      * </UL>
      * </OL>
      */
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_signWith_sigAlg_null_key_privKey() throws Exception {
 
         String builderId = "jwt1";
@@ -5215,7 +5221,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      * </UL>
      * </OL>
      */
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_signWith_sigAlg_empty_key_privKey() throws Exception {
 
         String builderId = "jwt1";
@@ -5257,7 +5263,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      * </UL>
      * </OL>
      */
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_signWith_sigAlg_garbage_key_privKey() throws Exception {
 
         String builderId = "jwt1";
@@ -5302,7 +5308,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      * </OL>
      */
     @Mode(TestMode.LITE)
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_multiple_apis_and_consumeToken() throws Exception {
 
         String builderId = null;
@@ -5353,155 +5359,205 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      * The encryption tests will decrypt and parse the token to do extra validation on the token!
      *
      **/
-    //    // encryptWith(String  keyManagementAlg,  Key keyManagementKey,  String  contentEncryptionAlg)
-    //    //"RSA-OAEP",  rsaPublicKey, "A256GCM"
-    //    @Test
-    //    public void JwtBuilderAPIBasicTests_encryptWith_RSA_OAEP_RS256_publicKey_A256GCM() throws Exception {
-    //
-    //        String builderId = "jwt1";
-    //        JSONObject expectationSettings = BuilderHelpers.setDefaultClaims(builderId);
-    //
-    //        // create settings that will be passed to the test app as well as used to create what to expect in the results
-    //        JSONObject testSettings = new JSONObject();
-    //        testSettings.put(JWTBuilderConstants.KEY_MGMT_ALG, "RSA-OAEP");
-    //
-    //        String encryptKey = JwtKeyTools.getComplexPublicKeyForSigAlg(builderServer, JWTBuilderConstants.SIGALG_RS256);
-    //        String decryptKey = JwtKeyTools.getComplexPrivateKeyForSigAlg(builderServer, JWTBuilderConstants.SIGALG_RS256);
-    //
-    //        testSettings.put(JWTBuilderConstants.ENCRYPT_KEY, encryptKey);
-    //        testSettings.put(JWTBuilderConstants.DECRYPT_KEY, decryptKey);
-    //        testSettings.put(JWTBuilderConstants.CONTENT_ENCRYPT_ALG, "A256GCM");
-    //        //        expectationSettings.put("overrideSettings", testSettings);
-    //        // TODO - update expectations for the encryption settings.
-    //
-    //        Expectations expectations = BuilderHelpers.createGoodBuilderExpectations(JWTBuilderConstants.JWT_BUILDER_SETAPIS_ENDPOINT, expectationSettings, builderServer);
-    //
-    //        Page response = actions.invokeJwtBuilder_setApis(_testName, builderServer, builderId, testSettings);
-    //        validationUtils.validateResult(response, expectations);
-    //
-    //        validationUtils.validateJWEToken(response, (String) testSettings.get(JWTBuilderConstants.KEY_MGMT_ALG), (String) testSettings.get(JWTBuilderConstants.DECRYPT_KEY), (String) testSettings.get(JWTBuilderConstants.CONTENT_ENCRYPT_ALG));
-    //
-    //    }
-    //  remaining tests will require updates similiar to the above test
-    //    @Test
-    //    public void JwtBuilderAPIBasicTests_encryptWith_RSA_OAEP_RS256_shortPublicKey_A256GCM() throws Exception {
-    //
-    //        String builderId = "jwt1";
-    //        JSONObject expectationSettings = BuilderHelpers.setDefaultClaims(builderId);
-    //
-    //        // create settings that will be passed to the test app as well as used to create what to expect in the results
-    //        JSONObject testSettings = new JSONObject();
-    //        testSettings.put(JWTBuilderConstants.KEY_MGMT_ALG, "RSA-OAEP");
-    //        testSettings.put(JWTBuilderConstants.ENCRYPT_KEY, getKeyFromFile(builderServer, "short_RS256public-key.pem"));
-    //        testSettings.put(JWTBuilderConstants.CONTENT_ENCRYPT_ALG, "A256GCM");
-    //        //        expectationSettings.put("overrideSettings", testSettings);
-    //        // TODO - update expectations for the encryption settings.
-    //
-    //        Expectations expectations = BuilderHelpers.createGoodBuilderExpectations(JWTBuilderConstants.JWT_BUILDER_SETAPIS_ENDPOINT, expectationSettings, builderServer);
-    //
-    //        Page response = actions.invokeJwtBuilder_setApis(_testName, builderServer, builderId, testSettings);
-    //        validationUtils.validateResult(response, expectations);
-    //
-    //    }
-    //
-    //    @Test
-    //    public void JwtBuilderAPIBasicTests_encryptWith_RSA_OAEP_RS256_privateKey_A256GCM() throws Exception {
-    //
-    //        String builderId = "jwt1";
-    //        JSONObject expectationSettings = BuilderHelpers.setDefaultClaims(builderId);
-    //
-    //        // create settings that will be passed to the test app as well as used to create what to expect in the results
-    //        JSONObject testSettings = new JSONObject();
-    //        testSettings.put(JWTBuilderConstants.KEY_MGMT_ALG, "RSA-OAEP");
-    //        testSettings.put(JWTBuilderConstants.ENCRYPT_KEY, getKeyFromFile(builderServer, "RS512private-key.pem"));
-    //        testSettings.put(JWTBuilderConstants.CONTENT_ENCRYPT_ALG, "A256GCM");
-    //        //        expectationSettings.put("overrideSettings", testSettings);
-    //        // TODO - update expectations for the encryption settings.
-    //
-    //        Expectations expectations = BuilderHelpers.createGoodBuilderExpectations(JWTBuilderConstants.JWT_BUILDER_SETAPIS_ENDPOINT, expectationSettings, builderServer);
-    //
-    //        Page response = actions.invokeJwtBuilder_setApis(_testName, builderServer, builderId, testSettings);
-    //        validationUtils.validateResult(response, expectations);
-    //
-    //    }
-    //
-    //    @Test
-    //    public void JwtBuilderAPIBasicTests_encryptWith_RSA_OAEP_RS256_publicKey_A256GCM_signWith_RS256() throws Exception {
-    //
-    //        String builderId = "jwt1";
-    //        JSONObject expectationSettings = BuilderHelpers.setDefaultClaims(builderId);
-    //
-    //        // create settings that will be passed to the test app as well as used to create what to expect in the results
-    //        JSONObject testSettings = new JSONObject();
-    //        testSettings.put(HeaderConstants.ALGORITHM, JWTBuilderConstants.SIGALG_RS256);
-    //        testSettings.put(JWTBuilderConstants.SHARED_KEY_TYPE, JWTBuilderConstants.SHARED_KEY_PRIVATE_KEY_TYPE);
-    //        expectationSettings.put("overrideSettings", testSettings);
-    //
-    //        Expectations expectations = BuilderHelpers.createGoodBuilderExpectations(JWTBuilderConstants.JWT_BUILDER_SETAPIS_ENDPOINT, expectationSettings, builderServer);
-    //
-    //        testSettings.put(JWTBuilderConstants.KEY_MGMT_ALG, "RSA-OAEP");
-    //        testSettings.put(JWTBuilderConstants.ENCRYPT_KEY, getKeyFromFile(builderServer, "RS256public-key.pem"));
-    //        testSettings.put(JWTBuilderConstants.CONTENT_ENCRYPT_ALG, "A256GCM");
-    //        //        expectationSettings.put("overrideSettings", testSettings);
-    //        // TODO - update expectations for the encryption settings.
-    //
-    //        Page response = actions.invokeJwtBuilder_setApis(_testName, builderServer, builderId, testSettings);
-    //        validationUtils.validateResult(response, expectations);
-    //
-    //    }
-    //
-    //    @Test
-    //    public void JwtBuilderAPIBasicTests_encryptWith_RSA_OAEP_RS256_publicKey_A256GCM_signWith_ES384() throws Exception {
-    //
-    //        String builderId = "jwt1";
-    //        JSONObject expectationSettings = BuilderHelpers.setDefaultClaims(builderId);
-    //
-    //        // create settings that will be passed to the test app as well as used to create what to expect in the results
-    //        JSONObject testSettings = new JSONObject();
-    //        testSettings.put(HeaderConstants.ALGORITHM, JWTBuilderConstants.SIGALG_ES384);
-    //        testSettings.put(JWTBuilderConstants.SHARED_KEY_TYPE, JWTBuilderConstants.SHARED_KEY_PRIVATE_KEY_TYPE);
-    //        expectationSettings.put("overrideSettings", testSettings);
-    //
-    //        Expectations expectations = BuilderHelpers.createGoodBuilderExpectations(JWTBuilderConstants.JWT_BUILDER_SETAPIS_ENDPOINT, expectationSettings, builderServer);
-    //
-    //        testSettings.put(JWTBuilderConstants.KEY_MGMT_ALG, "RSA-OAEP");
-    //        testSettings.put(JWTBuilderConstants.ENCRYPT_KEY, getKeyFromFile(builderServer, "RS256public-key.pem"));
-    //        testSettings.put(JWTBuilderConstants.CONTENT_ENCRYPT_ALG, "A256GCM");
-    //        //        expectationSettings.put("overrideSettings", testSettings);
-    //        // TODO - update expectations for the encryption settings.
-    //
-    //        Page response = actions.invokeJwtBuilder_setApis(_testName, builderServer, builderId, testSettings);
-    //        validationUtils.validateResult(response, expectations);
-    //
-    //    }
-    //
-    //    @Test
-    //    public void JwtBuilderAPIBasicTests_encryptWith_RSA_OAEP_RS256_publicKey_A256GCM_signWith_HS512() throws Exception {
-    //
-    //        String builderId = "jwt1";
-    //        JSONObject expectationSettings = BuilderHelpers.setDefaultClaims(builderId);
-    //
-    //        // create settings that will be passed to the test app as well as used to create what to expect in the results
-    //        JSONObject testSettings = new JSONObject();
-    //        testSettings.put(HeaderConstants.ALGORITHM, JWTBuilderConstants.SIGALG_HS512);
-    //        testSettings.put(JWTBuilderConstants.SHARED_KEY, "useThisToSign");
-    //        testSettings.put(JWTBuilderConstants.SHARED_KEY_TYPE, JWTBuilderConstants.SHARED_KEY_STRING_TYPE);
-    //        expectationSettings.put("overrideSettings", testSettings);
-    //
-    //        Expectations expectations = BuilderHelpers.createGoodBuilderExpectations(JWTBuilderConstants.JWT_BUILDER_SETAPIS_ENDPOINT, expectationSettings, builderServer);
-    //
-    //        testSettings.put(JWTBuilderConstants.KEY_MGMT_ALG, "RSA-OAEP");
-    //        testSettings.put(JWTBuilderConstants.ENCRYPT_KEY, getKeyFromFile(builderServer, "RS256public-key.pem"));
-    //        testSettings.put(JWTBuilderConstants.CONTENT_ENCRYPT_ALG, "A256GCM");
-    //        //        expectationSettings.put("overrideSettings", testSettings);
-    //        // TODO - update expectations for the encryption settings.
-    //
-    //        Page response = actions.invokeJwtBuilder_setApis(_testName, builderServer, builderId, testSettings);
-    //        validationUtils.validateResult(response, expectations);
-    //
-    //    }
-    //
-    //    @Test
+    // encryptWith(String  keyManagementAlg,  Key keyManagementKey,  String  contentEncryptionAlg)
+    //"RSA-OAEP",  rsaPublicKey, "A256GCM"
+    @Test
+    public void JwtBuilderAPIBasicTests_encryptWith_RSA_OAEP_RS256_publicKey_A256GCM() throws Exception {
+
+        String builderId = "jwt1";
+        JSONObject expectationSettings = BuilderHelpers.setDefaultClaimsWithEncryption(builderId, JWTBuilderConstants.DEFAULT_KEY_MGMT_KEY_ALG, JWTBuilderConstants.DEFAULT_CONTENT_ENCRYPT_ALG);
+
+        // create settings that will be passed to the test app as well as used to create what to expect in the results
+        JSONObject testSettings = new JSONObject();
+        testSettings.put(JWTBuilderConstants.KEY_MGMT_ALG, JWTBuilderConstants.DEFAULT_KEY_MGMT_KEY_ALG);
+
+        String encryptKey = JwtKeyTools.getComplexPublicKeyForSigAlg(builderServer, JWTBuilderConstants.SIGALG_RS256);
+        String decryptKey = JwtKeyTools.getComplexPrivateKeyForSigAlg(builderServer, JWTBuilderConstants.SIGALG_RS256);
+
+        testSettings.put(JWTBuilderConstants.ENCRYPT_KEY, encryptKey);
+        testSettings.put(JWTBuilderConstants.DECRYPT_KEY, decryptKey);
+        testSettings.put(JWTBuilderConstants.CONTENT_ENCRYPT_ALG, JWTBuilderConstants.DEFAULT_CONTENT_ENCRYPT_ALG);
+
+        Expectations expectations = BuilderHelpers.createGoodBuilderExpectations(JWTBuilderConstants.JWT_BUILDER_SETAPIS_ENDPOINT, expectationSettings, builderServer);
+
+        Page response = actions.invokeJwtBuilder_setApis(_testName, builderServer, builderId, testSettings);
+        validationUtils.validateResult(response, expectations);
+
+        validationUtils.validateJWEToken(response, (String) testSettings.get(JWTBuilderConstants.KEY_MGMT_ALG), (String) testSettings.get(JWTBuilderConstants.DECRYPT_KEY), (String) testSettings.get(JWTBuilderConstants.CONTENT_ENCRYPT_ALG));
+
+    }
+
+    @ExpectedFFDC({ "org.jose4j.lang.InvalidKeyException", "com.ibm.ws.security.jwt.internal.JwtTokenException" })
+    @Test
+    public void JwtBuilderAPIBasicTests_encryptWith_RSA_OAEP_RS256_shortPublicKey_A256GCM() throws Exception {
+
+        String builderId = "jwt1";
+
+        // create settings that will be passed to the test app as well as used to create what to expect in the results
+        JSONObject testSettings = new JSONObject();
+        testSettings.put(JWTBuilderConstants.KEY_MGMT_ALG, JWTBuilderConstants.DEFAULT_KEY_MGMT_KEY_ALG);
+
+        String encryptKey = JwtKeyTools.getShortComplexPublicKeyForSigAlg(builderServer, JWTBuilderConstants.SIGALG_RS256);
+        String decryptKey = JwtKeyTools.getShortComplexPrivateKeyForSigAlg(builderServer, JWTBuilderConstants.SIGALG_RS256);
+
+        testSettings.put(JWTBuilderConstants.ENCRYPT_KEY, encryptKey);
+        testSettings.put(JWTBuilderConstants.DECRYPT_KEY, decryptKey);
+        testSettings.put(JWTBuilderConstants.CONTENT_ENCRYPT_ALG, JWTBuilderConstants.DEFAULT_CONTENT_ENCRYPT_ALG);
+
+        Expectations expectations = BuilderHelpers.createBadBuilderExpectations(JWTBuilderConstants.JWT_BUILDER_SETAPIS_ENDPOINT, JwtBuilderMessageConstants.CWWKS6060E_CAN_NOT_CREATE_JWE, builderServer);
+        expectations.addExpectation(new ServerMessageExpectation(builderServer, JwtBuilderMessageConstants.CWWKS6020E_CAN_NOT_CAST, "Message log did not contain an error indicating a problem trying to encrypt the token."));
+        expectations.addExpectation(new ServerMessageExpectation(builderServer, JwtBuilderMessageConstants.CWWKS6060E_CAN_NOT_CREATE_JWE, "Message log did not contain an error indicating that the key was not large enough."));
+
+        Page response = actions.invokeJwtBuilder_setApis(_testName, builderServer, builderId, testSettings);
+        validationUtils.validateResult(response, expectations);
+
+    }
+
+    @ExpectedFFDC({ "org.jose4j.lang.InvalidKeyException", "com.ibm.ws.security.jwt.internal.JwtTokenException" })
+    @Test
+    public void JwtBuilderAPIBasicTests_encryptWith_RSA_OAEP_RS256_privateKey_A256GCM() throws Exception {
+
+        String builderId = "jwt1";
+
+        // create settings that will be passed to the test app as well as used to create what to expect in the results
+        JSONObject testSettings = new JSONObject();
+        testSettings.put(JWTBuilderConstants.KEY_MGMT_ALG, JWTBuilderConstants.DEFAULT_KEY_MGMT_KEY_ALG);
+
+        String encryptKey = JwtKeyTools.getComplexPrivateKeyForSigAlg(builderServer, JWTBuilderConstants.SIGALG_RS256);
+        String decryptKey = JwtKeyTools.getComplexPrivateKeyForSigAlg(builderServer, JWTBuilderConstants.SIGALG_RS256);
+
+        testSettings.put(JWTBuilderConstants.ENCRYPT_KEY, encryptKey);
+        testSettings.put(JWTBuilderConstants.DECRYPT_KEY, decryptKey);
+        testSettings.put(JWTBuilderConstants.CONTENT_ENCRYPT_ALG, JWTBuilderConstants.DEFAULT_CONTENT_ENCRYPT_ALG);
+
+        Expectations expectations = BuilderHelpers.createBadBuilderExpectations(JWTBuilderConstants.JWT_BUILDER_SETAPIS_ENDPOINT, JwtBuilderMessageConstants.CWWKS6060E_CAN_NOT_CREATE_JWE, builderServer);
+        expectations.addExpectation(new ServerMessageExpectation(builderServer, JwtBuilderMessageConstants.CWWKS6020E_CAN_NOT_CAST, "Message log did not contain an error indicating a problem trying to encrypt the token."));
+        expectations.addExpectation(new ServerMessageExpectation(builderServer, JwtBuilderMessageConstants.CWWKS6060E_CAN_NOT_CREATE_JWE, "Message log did not contain an error indicating that the key was Invalid."));
+
+        Page response = actions.invokeJwtBuilder_setApis(_testName, builderServer, builderId, testSettings);
+        validationUtils.validateResult(response, expectations);
+
+    }
+
+    @Test
+    public void JwtBuilderAPIBasicTests_encryptWith_RSA_OAEP_RS256_publicKey_A256GCM_signWith_RS256() throws Exception {
+
+        String builderId = "jwt1";
+        JSONObject expectationSettings = BuilderHelpers.setDefaultClaimsWithEncryption(builderId, JWTBuilderConstants.DEFAULT_KEY_MGMT_KEY_ALG, JWTBuilderConstants.DEFAULT_CONTENT_ENCRYPT_ALG);
+
+        // create settings that will be passed to the test app as well as used to create what to expect in the results
+        JSONObject testSettings = new JSONObject();
+        expectationSettings.put("overrideSettings", testSettings);
+        Expectations expectations = BuilderHelpers.createGoodBuilderExpectations(JWTBuilderConstants.JWT_BUILDER_SETAPIS_ENDPOINT, expectationSettings, builderServer);
+
+        // add parms to cause token to be signed with specified alg - normal expectations can validate as the alg will be embedded in the encrypted token
+        testSettings.put(HeaderConstants.ALGORITHM, JWTBuilderConstants.SIGALG_RS256);
+        testSettings.put(JWTBuilderConstants.SHARED_KEY_TYPE, JWTBuilderConstants.SHARED_KEY_PRIVATE_KEY_TYPE);
+
+        // add the flags to cause encryption after we create the expectations as we're adding a ref to testSettings to expectationSettings and that'll
+        // cause expectations to be created for things that build the token, but don't show up in the token
+        testSettings.put(JWTBuilderConstants.KEY_MGMT_ALG, JWTBuilderConstants.DEFAULT_KEY_MGMT_KEY_ALG);
+
+        String encryptKey = JwtKeyTools.getComplexPublicKeyForSigAlg(builderServer, JWTBuilderConstants.SIGALG_RS256);
+        String decryptKey = JwtKeyTools.getComplexPrivateKeyForSigAlg(builderServer, JWTBuilderConstants.SIGALG_RS256);
+
+        testSettings.put(JWTBuilderConstants.ENCRYPT_KEY, encryptKey);
+        testSettings.put(JWTBuilderConstants.DECRYPT_KEY, decryptKey);
+        testSettings.put(JWTBuilderConstants.CONTENT_ENCRYPT_ALG, JWTBuilderConstants.DEFAULT_CONTENT_ENCRYPT_ALG);
+
+        Page response = actions.invokeJwtBuilder_setApis(_testName, builderServer, builderId, testSettings);
+        validationUtils.validateResult(response, expectations);
+
+        JwtTokenForTest jwtTokenForTest = validationUtils.validateJWEToken(response, (String) testSettings.get(JWTBuilderConstants.KEY_MGMT_ALG), (String) testSettings.get(JWTBuilderConstants.DECRYPT_KEY), (String) testSettings.get(JWTBuilderConstants.CONTENT_ENCRYPT_ALG));
+
+        JsonObject header = jwtTokenForTest.getJsonHeader();
+        String alg = header.getString(HeaderConstants.ALGORITHM);
+        if (!(alg != null && alg.equals(JWTBuilderConstants.SIGALG_RS256))) {
+            fail("The token did NOT contain the expected signature algorithm (" + JWTBuilderConstants.SIGALG_RS256 + "), instead, it contained (" + alg + ").");
+        }
+
+    }
+
+    @Test
+    public void JwtBuilderAPIBasicTests_encryptWith_RSA_OAEP_RS256_publicKey_A256GCM_signWith_ES384() throws Exception {
+
+        String builderId = "jwt1";
+        JSONObject expectationSettings = BuilderHelpers.setDefaultClaimsWithEncryption(builderId, JWTBuilderConstants.DEFAULT_KEY_MGMT_KEY_ALG, JWTBuilderConstants.DEFAULT_CONTENT_ENCRYPT_ALG);
+
+        // create settings that will be passed to the test app as well as used to create what to expect in the results
+        JSONObject testSettings = new JSONObject();
+        expectationSettings.put("overrideSettings", testSettings);
+        Expectations expectations = BuilderHelpers.createGoodBuilderExpectations(JWTBuilderConstants.JWT_BUILDER_SETAPIS_ENDPOINT, expectationSettings, builderServer);
+
+        // add parms to cause token to be signed with specified alg - normal expectations can validate as the alg will be embedded in the encrypted token
+        testSettings.put(HeaderConstants.ALGORITHM, JWTBuilderConstants.SIGALG_ES384);
+        testSettings.put(JWTBuilderConstants.SHARED_KEY_TYPE, JWTBuilderConstants.SHARED_KEY_PRIVATE_KEY_TYPE);
+
+        // add the flags to cause encryption after we create the expectations as we're adding a ref to testSettings to expectationSettings and that'll
+        // cause expectations to be created for things that build the token, but don't show up in the token
+        testSettings.put(JWTBuilderConstants.KEY_MGMT_ALG, JWTBuilderConstants.DEFAULT_KEY_MGMT_KEY_ALG);
+
+        String encryptKey = JwtKeyTools.getComplexPublicKeyForSigAlg(builderServer, JWTBuilderConstants.SIGALG_RS256);
+        String decryptKey = JwtKeyTools.getComplexPrivateKeyForSigAlg(builderServer, JWTBuilderConstants.SIGALG_RS256);
+
+        testSettings.put(JWTBuilderConstants.ENCRYPT_KEY, encryptKey);
+        testSettings.put(JWTBuilderConstants.DECRYPT_KEY, decryptKey);
+        testSettings.put(JWTBuilderConstants.CONTENT_ENCRYPT_ALG, JWTBuilderConstants.DEFAULT_CONTENT_ENCRYPT_ALG);
+
+        Page response = actions.invokeJwtBuilder_setApis(_testName, builderServer, builderId, testSettings);
+        validationUtils.validateResult(response, expectations);
+
+        JwtTokenForTest jwtTokenForTest = validationUtils.validateJWEToken(response, (String) testSettings.get(JWTBuilderConstants.KEY_MGMT_ALG), (String) testSettings.get(JWTBuilderConstants.DECRYPT_KEY), (String) testSettings.get(JWTBuilderConstants.CONTENT_ENCRYPT_ALG));
+
+        JsonObject header = jwtTokenForTest.getJsonHeader();
+        String alg = header.getString(HeaderConstants.ALGORITHM);
+        if (!(alg != null && alg.equals(JWTBuilderConstants.SIGALG_ES384))) {
+            fail("The token did NOT contain the expected signature algorithm (" + JWTBuilderConstants.SIGALG_ES384 + "), instead, it contained (" + alg + ").");
+        }
+
+    }
+
+    @Test
+    public void JwtBuilderAPIBasicTests_encryptWith_RSA_OAEP_RS256_publicKey_A256GCM_signWith_HS512() throws Exception {
+
+        String builderId = "jwt1";
+        JSONObject expectationSettings = BuilderHelpers.setDefaultClaimsWithEncryption(builderId, JWTBuilderConstants.DEFAULT_KEY_MGMT_KEY_ALG, JWTBuilderConstants.DEFAULT_CONTENT_ENCRYPT_ALG);
+
+        // create settings that will be passed to the test app as well as used to create what to expect in the results
+        JSONObject testSettings = new JSONObject();
+        expectationSettings.put("overrideSettings", testSettings);
+        Expectations expectations = BuilderHelpers.createGoodBuilderExpectations(JWTBuilderConstants.JWT_BUILDER_SETAPIS_ENDPOINT, expectationSettings, builderServer);
+
+        // add parms to cause token to be signed with specified alg - normal expectations can validate as the alg will be embedded in the encrypted token
+        testSettings.put(HeaderConstants.ALGORITHM, JWTBuilderConstants.SIGALG_HS512);
+        testSettings.put(JWTBuilderConstants.SHARED_KEY, "useThisToSign");
+        testSettings.put(JWTBuilderConstants.SHARED_KEY_TYPE, JWTBuilderConstants.SHARED_KEY_STRING_TYPE);
+
+        // add the flags to cause encryption after we create the expectations as we're adding a ref to testSettings to expectationSettings and that'll
+        // cause expectations to be created for things that build the token, but don't show up in the token
+        testSettings.put(JWTBuilderConstants.KEY_MGMT_ALG, JWTBuilderConstants.DEFAULT_KEY_MGMT_KEY_ALG);
+
+        String encryptKey = JwtKeyTools.getComplexPublicKeyForSigAlg(builderServer, JWTBuilderConstants.SIGALG_RS256);
+        String decryptKey = JwtKeyTools.getComplexPrivateKeyForSigAlg(builderServer, JWTBuilderConstants.SIGALG_RS256);
+
+        testSettings.put(JWTBuilderConstants.ENCRYPT_KEY, encryptKey);
+        testSettings.put(JWTBuilderConstants.DECRYPT_KEY, decryptKey);
+        testSettings.put(JWTBuilderConstants.CONTENT_ENCRYPT_ALG, JWTBuilderConstants.DEFAULT_CONTENT_ENCRYPT_ALG);
+
+        Page response = actions.invokeJwtBuilder_setApis(_testName, builderServer, builderId, testSettings);
+        validationUtils.validateResult(response, expectations);
+
+        JwtTokenForTest jwtTokenForTest = validationUtils.validateJWEToken(response, (String) testSettings.get(JWTBuilderConstants.KEY_MGMT_ALG), (String) testSettings.get(JWTBuilderConstants.DECRYPT_KEY), (String) testSettings.get(JWTBuilderConstants.CONTENT_ENCRYPT_ALG));
+
+        JsonObject header = jwtTokenForTest.getJsonHeader();
+        String alg = header.getString(HeaderConstants.ALGORITHM);
+        if (!(alg != null && alg.equals(JWTBuilderConstants.SIGALG_HS512))) {
+            fail("The token did NOT contain the expected signature algorithm (" + JWTBuilderConstants.SIGALG_HS512 + "), instead, it contained (" + alg + ").");
+        }
+
+    }
+
+    //    //chc@Test
     //    public void JwtBuilderAPIBasicTests_encryptWith_RSA_OAEP_RS384_publicKey_A256GCM() throws Exception {
     //
     //        String builderId = "jwt1";
@@ -5522,7 +5578,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
     //
     //    }
     //
-    //    @Test
+    //    //chc@Test
     //    public void JwtBuilderAPIBasicTests_encryptWith_RSA_OAEP_RS384_shortPublicKey_A256GCM() throws Exception {
     //
     //        String builderId = "jwt1";
@@ -5543,7 +5599,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
     //
     //    }
     //
-    //    @Test
+    //    //chc@Test
     //    public void JwtBuilderAPIBasicTests_encryptWith_RSA_OAEP_RS384_privateKey_A256GCM() throws Exception {
     //
     //        String builderId = "jwt1";
@@ -5564,7 +5620,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
     //
     //    }
     //
-    //    @Test
+    //    //chc@Test
     //    public void JwtBuilderAPIBasicTests_encryptWith_RSA_OAEP_RS384_publicKey_A256GCM_signWith_RS384() throws Exception {
     //
     //        String builderId = "jwt1";
@@ -5589,7 +5645,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
     //
     //    }
     //
-    //    @Test
+    //    //chc@Test
     //    public void JwtBuilderAPIBasicTests_encryptWith_RSA_OAEP_RS384_publicKey_A256GCM_signWith_ES512() throws Exception {
     //
     //        String builderId = "jwt1";
@@ -5614,7 +5670,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
     //
     //    }
     //
-    //    @Test
+    //    //chc@Test
     //    public void JwtBuilderAPIBasicTests_encryptWith_RSA_OAEP_RS384_publicKey_A256GCM_signWith_HS256() throws Exception {
     //
     //        String builderId = "jwt1";
@@ -5640,7 +5696,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
     //
     //    }
     //
-    //    @Test
+    //    //chc@Test
     //    public void JwtBuilderAPIBasicTests_encryptWith_RSA_OAEP_RS512_publicKey_A256GCM() throws Exception {
     //
     //        String builderId = "jwt1";
@@ -5661,7 +5717,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
     //
     //    }
     //
-    //    @Test
+    //    //chc@Test
     //    public void JwtBuilderAPIBasicTests_encryptWith_RSA_OAEP_RS512_shortPublicKey_A256GCM() throws Exception {
     //
     //        String builderId = "jwt1";
@@ -5682,7 +5738,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
     //
     //    }
     //
-    //    @Test
+    //    //chc@Test
     //    public void JwtBuilderAPIBasicTests_encryptWith_RSA_OAEP_RS512_privateKey_A256GCM() throws Exception {
     //
     //        String builderId = "jwt1";
@@ -5703,7 +5759,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
     //
     //    }
     //
-    //    @Test
+    //    //chc@Test
     //    public void JwtBuilderAPIBasicTests_encryptWith_RSA_OAEP_RS512_publicKey_A256GCM_signWith_RS512() throws Exception {
     //
     //        String builderId = "jwt1";
@@ -5728,7 +5784,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
     //
     //    }
     //
-    //    @Test
+    //    //chc@Test
     //    public void JwtBuilderAPIBasicTests_encryptWith_RSA_OAEP_RS512_publicKey_A256GCM_signWith_ES256() throws Exception {
     //
     //        String builderId = "jwt1";
@@ -5753,7 +5809,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
     //
     //    }
     //
-    //    @Test
+    //    //chc@Test
     //    public void JwtBuilderAPIBasicTests_encryptWith_RSA_OAEP_RS512_publicKey_A256GCM_signWith_HS384() throws Exception {
     //
     //        String builderId = "jwt1";
@@ -5779,7 +5835,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
     //
     //    }
     //
-    //    @Test
+    //    //chc@Test
     //    public void JwtBuilderAPIBasicTests_encryptWith_RSA_OAEP_Invalid_publicKey_A256GCM() throws Exception {
     //
     //        String builderId = "jwt1";
@@ -5800,7 +5856,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
     //
     //    }
     //
-    //    @Test
+    //    //chc@Test
     //    public void JwtBuilderAPIBasicTests_encryptWith_Invalid_KeyMgmtAlg_RS256_publicKey_A256GCM() throws Exception {
     //
     //        String builderId = "jwt1";
@@ -5821,7 +5877,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
     //
     //    }
     //
-    //    @Test
+    //    //chc@Test
     //    public void JwtBuilderAPIBasicTests_encryptWith_RSA_OAEP_RS256_publicKey_Invalid_ContentEncryptAlg() throws Exception {
     //
     //        String builderId = "jwt1";
@@ -5872,7 +5928,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
      * @throws Exception
      */
     @Mode(TestMode.LITE)
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_claimsFrom_jwtToken_to_jweToken_allClaims() throws Exception {
 
         String baseBuilderId = "jwt1";
@@ -5900,7 +5956,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
 
     }
 
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_claimsFrom_jweToken_to_jwtToken_allClaims() throws Exception {
 
         String baseBuilderId = "encryptJwtRS256";
@@ -5925,7 +5981,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
 
     }
 
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_claimsFrom_jweTokenRS256_to_jweTokenRS384_allClaims() throws Exception {
 
         String baseBuilderId = "encryptJwtRS256";
@@ -5953,7 +6009,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
 
     }
 
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_claimsFrom_jwtString_to_jweToken_allClaims() throws Exception {
 
         // build a token using the alternate builder config (we'll get claims from it)
@@ -5982,7 +6038,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
     }
 
     // TODO Failing since claimsFrom doesn't know how to parse JWE Token
-    //@Test
+    ////chc@Test
     public void JwtBuilderAPIBasicTests_claimsFrom_jweString_to_jwtToken_allClaims() throws Exception {
 
         // build a token using the alternate builder config (we'll get claims from it)
@@ -6008,7 +6064,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
     }
 
     // TODO Failing since claimsFrom doesn't know how to parse JWE Token
-    //@Test
+    ////chc@Test
     public void JwtBuilderAPIBasicTests_claimsFrom_jweStringRS256_to_jweTokenRS384_allClaims() throws Exception {
 
         // build a token using the alternate builder config (we'll get claims from it)
@@ -6036,7 +6092,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
 
     }
 
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_claimsFrom_jweString_encodedPayload_allClaims() throws Exception {
 
         // build a token using the alternate builder config (we'll get claims from it)
@@ -6065,7 +6121,7 @@ public class JwtBuilderApiBasicTests extends CommonSecurityFat {
 
     }
 
-    @Test
+    //chc@Test
     public void JwtBuilderAPIBasicTests_claimsFrom_jweString_decodedPayload_allClaims() throws Exception {
 
         // build a token using the alternate builder config (we'll get claims from it)

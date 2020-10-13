@@ -41,11 +41,11 @@ public abstract class Expectation {
         this.testAction = testAction;
         this.searchLocation = searchLocation;
         this.checkType = checkType;
-        this.validationKey = searchKey;
-        this.validationValue = searchFor;
+        validationKey = searchKey;
+        validationValue = searchFor;
         this.failureMsg = failureMsg;
-        this.isExpectationHandled = false;
-        this.failureMsgAlreadyUpdated = false;
+        isExpectationHandled = false;
+        failureMsgAlreadyUpdated = false;
     }
 
     public String getAction() {
@@ -97,6 +97,7 @@ public abstract class Expectation {
         if (!isExpectationForAction(currentTestAction)) {
             return;
         }
+        printValidationMessage = "true";
         // if we're running locally, print the extra debug message (we may be writing new tests and want to see what we're checking)
         if (printValidationMessage == null || printValidationMessage.equals("true")) {
             Log.info(thisClass, "validate", "Checking " + this);
