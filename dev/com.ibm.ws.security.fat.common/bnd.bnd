@@ -21,7 +21,6 @@ Export-Package: \
 Import-Package: \
     !*.internal.*, \
     !com.ibm.ws.kernel.boot.cmdline, \
-    org.jose4j.*, \
     *
 
 Private-Package: \

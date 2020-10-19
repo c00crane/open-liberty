@@ -6,7 +6,6 @@ import java.security.PrivateKey;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 
-import org.jose4j.base64url.Base64;
 import org.jose4j.base64url.SimplePEMEncoder;
 
 import com.ibm.websphere.simplicity.log.Log;
@@ -72,7 +71,7 @@ public class KeyTools {
 
         String base64 = publicKeyString.substring(beginIndex, endIndex).trim();
         //        Log.info(thisClass, "getPublicKeyFromPem", "base64: " + base64 + " end");
-        byte[] decode = Base64.decode(base64);
+        byte[] decode = SimplePEMEncoder.decode(base64);
 
         X509EncodedKeySpec keySpec = new X509EncodedKeySpec(decode);
         KeyFactory keyFactory = KeyFactory.getInstance("RSA");
