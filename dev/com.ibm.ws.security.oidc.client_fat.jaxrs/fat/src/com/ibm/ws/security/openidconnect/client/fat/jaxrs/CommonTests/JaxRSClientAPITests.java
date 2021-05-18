@@ -23,7 +23,6 @@ import com.ibm.ws.security.oauth_oidc.fat.commonTest.TestSettings;
 import com.ibm.ws.security.oauth_oidc.fat.commonTest.ValidationData.validationData;
 import com.meterware.httpunit.WebConversation;
 
-import componenttest.annotation.SkipForRepeat;
 import componenttest.custom.junit.runner.Mode;
 import componenttest.custom.junit.runner.Mode.TestMode;
 
@@ -209,7 +208,6 @@ public class JaxRSClientAPITests extends CommonTest {
 
     }
 
-    @SkipForRepeat(SkipForRepeat.EE9_FEATURES) // 17160 - EE9 client properties not supported yet
     @Mode(TestMode.LITE)
     @Test
     public void APIOidcJaxRSClientTests_jaxrsOAuthClientProperty_string_true() throws Exception {
@@ -226,7 +224,6 @@ public class JaxRSClientAPITests extends CommonTest {
 
     }
 
-    @SkipForRepeat(SkipForRepeat.EE9_FEATURES) // 17160 - EE9 client properties not supported yet
     @Mode(TestMode.LITE)
     @Test
     public void APIOidcJaxRSClientTests_jaxrsOAuthClientProperty_boolean_true() throws Exception {
@@ -243,7 +240,6 @@ public class JaxRSClientAPITests extends CommonTest {
 
     }
 
-    @SkipForRepeat(SkipForRepeat.EE9_FEATURES) // 17160 - EE9 client properties not supported yet
     @Mode(TestMode.LITE)
     @Test
     public void APIOidcJaxRSClientTests_jaxrsOAuthClientProperty_string_false() throws Exception {
@@ -261,7 +257,6 @@ public class JaxRSClientAPITests extends CommonTest {
 
     }
 
-    @SkipForRepeat(SkipForRepeat.EE9_FEATURES) // 17160 - EE9 client properties not supported yet
     @Mode(TestMode.LITE)
     @Test
     public void APIOidcJaxRSClientTests_jaxrsOAuthClientProperty_boolean_false() throws Exception {
@@ -279,7 +274,6 @@ public class JaxRSClientAPITests extends CommonTest {
 
     }
 
-    @SkipForRepeat(SkipForRepeat.EE9_FEATURES) // 17160 - EE9 client properties not supported yet
     @Mode(TestMode.LITE)
     @Test
     public void APIOidcJaxRSClientTests_jaxrsJWTClientProperty_string_true() throws Exception {
@@ -302,7 +296,6 @@ public class JaxRSClientAPITests extends CommonTest {
 
     }
 
-    @SkipForRepeat(SkipForRepeat.EE9_FEATURES) // 17160 - EE9 client properties not supported yet
     @Mode(TestMode.LITE)
     @Test
     public void APIOidcJaxRSClientTests_jaxrsJWTClientProperty_boolean_true() throws Exception {
@@ -325,7 +318,6 @@ public class JaxRSClientAPITests extends CommonTest {
 
     }
 
-    @SkipForRepeat(SkipForRepeat.EE9_FEATURES) // 17160 - EE9 client properties not supported yet
     @Mode(TestMode.LITE)
     @Test
     public void APIOidcJaxRSClientTests_jaxrsJWTClientProperty_string_false() throws Exception {
@@ -343,7 +335,6 @@ public class JaxRSClientAPITests extends CommonTest {
 
     }
 
-    @SkipForRepeat(SkipForRepeat.EE9_FEATURES) // 17160 - EE9 client properties not supported yet
     @Mode(TestMode.LITE)
     @Test
     public void APIOidcJaxRSClientTests_jaxrsJWTClientProperty_boolean_false() throws Exception {
