@@ -106,6 +106,7 @@
                 <Option label="%validationMethod.introspect" value="introspect" />
             	<Option label="%validationMethod.userinfo" value="userinfo" />
          </AD>
+         <AD id="allowJwtAccessTokenRemoteValidation" name="internal" description="internal use only" required="false" type="Boolean" default="false" />
          <AD id="authzParameter" name="%authzParameter" description="%authzParameter.desc" required="false" type="String" ibm:type="pid" ibm:reference="com.ibm.ws.security.openidconnect.client.param" cardinality="20" />
          <AD id="tokenParameter" name="%tokenParameter" description="%tokenParameter.desc" required="false" type="String" ibm:type="pid" ibm:reference="com.ibm.ws.security.openidconnect.client.param" cardinality="20" />
          <AD id="userinfoParameter" name="internal" description="internal use only" required="false" type="String" ibm:type="pid" ibm:reference="com.ibm.ws.security.openidconnect.client.param" cardinality="20" />
