@@ -6,7 +6,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *     IBM Corporation - initial API and implementation
+ * IBM Corporation - initial API and implementation
  *******************************************************************************/
 package com.ibm.ws.security.openidconnect.server.fat.jaxrs.config.CommonTests;
 
@@ -68,8 +68,8 @@ public class InboundPropagation2ServerTests extends CommonTest {
     private static final String WWW_AUTHENTICATE_HEADER = "WWW-Authenticate";
     protected static int OIDC_ERROR_1 = 1;
 
-    private JwtUtils jwtUtils = new JwtUtils();
-    
+    private final JwtUtils jwtUtils = new JwtUtils();
+
     protected static boolean isTestingOIDC = false;
 
     @Before
@@ -214,7 +214,7 @@ public class InboundPropagation2ServerTests extends CommonTest {
      * - Successfully reached the RS-protected resource
      *
      * @throws Exception
-     */    
+     */
     @Test
     public void InboundPropagation2ServerTests_inboundPropagation_required() throws Exception {
 
@@ -230,16 +230,44 @@ public class InboundPropagation2ServerTests extends CommonTest {
 
         WebConversation wc = new WebConversation();
         helpers.invokeRsProtectedResource(_testName, wc, commonPropagationToken, updatedTestSettings, expectations);
-        if (isTestingOIDC && ! commonPropagationToken.contains(".")) {  // test randomly chooses token types, this isn't valid for jwt's.
-        	testUserInfo(wc, commonPropagationToken);   // add test for #8203, #8222
+        if (isTestingOIDC && !commonPropagationToken.contains(".")) { // test randomly chooses token types, this isn't valid for jwt's.
+            testUserInfo(wc, commonPropagationToken); // add test for #8203, #8222
         }
     }
-    
+
+    /**
+     * inboundPropagation: "required"
+     * allowJwtAccessTokenRemoteValidation=true included in the config
+     * Expected results:
+     * - Successfully reached the RS-protected resource
+     *
+     * @throws Exception
+     */
+    @Test
+    public void InboundPropagation2ServerTests_inboundPropagation_required_allowJwtAccessTokenRemoteValidation_true() throws Exception {
+
+        TestSettings updatedTestSettings = rsTools.updateRSProtectedResource(testSettings, "helloworld_allowJwtAccessTokenRemoteValidation_inboundPropRequired");
+
+        List<validationData> expectations = commonTools.getValidHelloWorldExpectations(updatedTestSettings);
+
+        String validationType = genericTestServer.getRSValidationType();
+        if (validationType.equals(Constants.USERINFO_ENDPOINT)) {
+            // userinfo endpoint does not include a realm
+            expectations = commonTools.getValidHelloWorldExpectations(updatedTestSettings, REALM_FROM_ISS);
+        }
+
+        WebConversation wc = new WebConversation();
+        helpers.invokeRsProtectedResource(_testName, wc, commonPropagationToken, updatedTestSettings, expectations);
+        if (isTestingOIDC && !commonPropagationToken.contains(".")) { // test randomly chooses token types, this isn't valid for jwt's.
+            testUserInfo(wc, commonPropagationToken); // add test for #8203, #8222
+        }
+    }
+
     /**
      * Test that userinfo is retrieved and available from an API call. If userinfo url is defined and enabled in metadata, then
-     * upon authentication with an opaque token, 
+     * upon authentication with an opaque token,
      * the userinfo JSON from the OP, if available, is to be stored in the subject as a string and made
-     * accessible through the PropagationHelper API. 
+     * accessible through the PropagationHelper API.
      * This calls a jsp that invokes the PropagationHelper.getUserInfo() API to check the userinfo.
      * The userinfo endpoint only works on oidc unless the internal attrib requireOpenidScopeForUserInfo is set to false.
      */
@@ -255,9 +283,9 @@ public class InboundPropagation2ServerTests extends CommonTest {
         String testAction = "testUserInfo";
         String expectedUser = testSettings.getAdminUser();
         Expectations expectations = new Expectations();
-        expectations.addExpectation(Expectation.createResponseExpectation(testAction, "\"sub\":\"" + expectedUser + "\"", "Did not find expected \"sub\" claim and value in the JSP response."));  
+        expectations.addExpectation(Expectation.createResponseExpectation(testAction, "\"sub\":\"" + expectedUser + "\"", "Did not find expected \"sub\" claim and value in the JSP response."));
         expectations.addExpectation(new ResponseFullExpectation(testAction, Constants.STRING_MATCHES, "\"iss\":\"http[^\"]+/OidcConfigSample\"", "Did not find expected \"iss\" claim and value in the JSP response."));
-//        expectations.addExpectation(new Expectation(testAction, Constants.RESPONSE_FULL, Constants.STRING_MATCHES, "\"iss\":\"http[^\"]+/OidcConfigSample\"", "Did not find expected \"iss\" claim and value in the JSP response."));
+        //        expectations.addExpectation(new Expectation(testAction, Constants.RESPONSE_FULL, Constants.STRING_MATCHES, "\"iss\":\"http[^\"]+/OidcConfigSample\"", "Did not find expected \"iss\" claim and value in the JSP response."));
         List<validationData> convertedExpectations = ValidationDataToExpectationConverter.convertExpectations(expectations);
         validationTools.validateResult(resp, testAction, convertedExpectations, testSettings);
     }
@@ -302,6 +330,175 @@ public class InboundPropagation2ServerTests extends CommonTest {
     }
 
     /**
+     * inboundPropagation: "required"
+     * RS-protected resource invocation does not include propagation token
+     * allowJwtAccessTokenRemoteValidation=true included in the config
+     * Expected results:
+     * - Per section 3.1 of the Bearer token spec (RFC6750), 401 status when invoking RS-protected resource
+     * - Per section 3 (RFC6750), response contains WWW-Authenticate header with an auth-scheme of "Bearer"
+     * - Per section 3 (RFC6750), WWW-Authenticate header contains at least one auth-param value
+     * - Per section 3.1 (RFC6750), response should not contain an error code or other error information
+     *
+     * @throws Exception
+     */
+    @Test
+    public void InboundPropagation2ServerTests_inboundPropagation_required_missingPropagationToken_allowJwtAccessTokenRemoteValidation_true() throws Exception {
+
+        TestSettings updatedTestSettings = rsTools.updateRSProtectedResource(testSettings, "helloworld_allowJwtAccessTokenRemoteValidation_inboundPropRequired");
+
+        // Section 3.1, Bearer Token spec (RFC6750): Example without authentication information shows a 401 being returned
+        List<validationData> expectations = validationTools.add401Responses(Constants.INVOKE_RS_PROTECTED_RESOURCE);
+
+        // Section 3 (RFC6750): Protected resource request without authentication credentials must include WWW-Authenticate header with "Bearer" auth-scheme
+        String properAuthenticateHeader = WWW_AUTHENTICATE_HEADER.toUpperCase() + ": " + Constants.BEARER;
+        expectations = vData.addExpectation(expectations, Constants.INVOKE_RS_PROTECTED_RESOURCE, Constants.RESPONSE_HEADER, Constants.STRING_CONTAINS, "Response did not include a WWW-Authenticate header with Bearer auth-scheme.", null, properAuthenticateHeader);
+
+        // iss 3710 // expectations = validationTools.addMessageExpectation(genericTestServer, expectations, Constants.INVOKE_RS_PROTECTED_RESOURCE, Constants.MESSAGES_LOG, Constants.STRING_CONTAINS, "Did not get message in RS logs saying propagation token was missing.", MessageConstants.CWWKS1726E_MISSING_PROPAGATION_TOKEN);
+
+        helpers.invokeRSProtectedResource(_testName, Constants.POSTMETHOD, null, null, updatedTestSettings, expectations);
+
+    }
+
+    /**
+     * inboundPropagation: "supported"
+     * Submit protected resource request with expired propagation token
+     * Expected results:
+     * - Accessing resource with expired token should fail
+     * - Request should fall back to pure OAuth/OIDC flow
+     * - Request should fail the same as if inboundPropagation="none" were specified
+     *
+     * @throws Exception
+     */
+    @AllowedFFDC({ "com.ibm.oauth.core.api.error.oauth20.OAuth20InvalidRedirectUriException", "java.lang.IllegalStateException" })
+    @Test
+    public void InboundPropagation2ServerTests_inboundPropagation_required_expiredPropagationToken() throws Exception {
+
+        TestSettings updatedTestSettings = rsTools.updateRSProtectedResource(testSettings, "helloworld_inboundPropRequired");
+
+        // Choose which expired token to use based on the selected token type
+        String expiredToken = oldAccessToken;
+        String tokenType = updatedTestSettings.getRsTokenType();
+        if (Constants.JWT_TOKEN.equals(tokenType)) {
+            String validKid = jwtUtils.getValidJwksKid(testSettings);
+            expiredToken = jwtUtils.buildOldJwtString(updatedTestSettings, validKid);
+        }
+
+        // Expired token should not allow access, so should fall back to pure OAuth/OIDC as if inboundPropagation was set to "none"
+        List<validationData> expectations = validationTools.add401Responses(Constants.INVOKE_RS_PROTECTED_RESOURCE);
+        //        expectations = validationTools.addMessageExpectation(genericTestServer, expectations, Constants.INVOKE_RS_PROTECTED_RESOURCE,
+        //                Constants.MESSAGES_LOG, Constants.STRING_CONTAINS,
+        //                "Did not get message in RS logs saying token validation failed.", MessageConstants.CWWKS1740W_RS_REDIRECT_TO_RP);
+        //
+        if (Constants.ACCESS_TOKEN_KEY.equals(tokenType)) {
+            expectations = validationTools.addMessageExpectation(genericTestServer, expectations, Constants.INVOKE_RS_PROTECTED_RESOURCE,
+                    Constants.MESSAGES_LOG, Constants.STRING_CONTAINS,
+                    "Did not get message in RS logs saying token validation failed.", MessageConstants.CWWKS1720E_ACCESS_TOKEN_NOT_ACTIVE);
+        } else {
+            expectations = validationTools.addMessageExpectation(genericTestServer, expectations, Constants.INVOKE_RS_PROTECTED_RESOURCE, Constants.MESSAGES_LOG, Constants.STRING_CONTAINS, "Did not get message in RS logs saying the OIDC client failed to validate the token.", MessageConstants.CWWKS1773E_TOKEN_EXPIRED);
+            expectations = validationTools.addMessageExpectation(genericTestServer, expectations, Constants.INVOKE_RS_PROTECTED_RESOURCE, Constants.MESSAGES_LOG, Constants.STRING_MATCHES, "Did not get message in RS logs saying the OIDC client failed to validate the token.", MessageConstants.CWWKS1737E_JWT_VALIDATION_FAILURE + ".*" + MessageConstants.CWWKS1773E_TOKEN_EXPIRED);
+        }
+
+        String validationType = genericTestServer.getRSValidationType();
+        // Errors when accessing protected resource because propagation token is expired
+        if (Constants.USERINFO_ENDPOINT.equals(validationType)) {
+            expectations = validationTools.addMessageExpectation(testOPServer, expectations, Constants.INVOKE_RS_PROTECTED_RESOURCE, Constants.MESSAGES_LOG, Constants.STRING_CONTAINS, "Did not get message in OP logs saying access token was not recognized.", MessageConstants.CWWKS1617E_USERINFO_REQUEST_BAD_TOKEN);
+            if (Constants.ACCESS_TOKEN_KEY.equals(tokenType)) {
+                expectations = validationTools.addMessageExpectation(genericTestServer, expectations, Constants.INVOKE_RS_PROTECTED_RESOURCE, Constants.MESSAGES_LOG, Constants.STRING_CONTAINS, "Did not get message in RS logs saying access token was not recognized.", MessageConstants.CWWKS1721E_OIDC_REQ_FAILED_ACCESS_TOKEN_NOT_VALID);
+            }
+        } else if (Constants.INTROSPECTION_ENDPOINT.equals(validationType)) {
+            expectations = validationTools.addMessageExpectation(testOPServer, expectations, Constants.INVOKE_RS_PROTECTED_RESOURCE, Constants.MESSAGES_LOG, Constants.STRING_CONTAINS, "Did not get message in OP logs saying access token was not valid.", MessageConstants.CWWKS1454E_ACCESS_TOKEN_NOT_VALID);
+        } else {
+            // Local validation - will see errors in the RS logs
+            String insertMsg = MessageConstants.CWWKS1739E_JWT_KEY_NOT_FOUND;
+            if (Constants.X509_CERT.equals(updatedTestSettings.getRsCertType())) {
+                if (testOPServer.getHttpDefaultSecurePort() != oldJWTTokenIssuerPort) {
+                    // The hard-coded old JWT has an issuer with port 8947, which typically should match the port we're using. However sometimes we don't get that port,
+                    // in which case the error message we'll see is one saying the issuer in the token doesn't match one of the trusted issuers.
+                    insertMsg = MessageConstants.CWWKS1781E_TOKEN_ISSUER_NOT_TRUSTED;
+                } else {
+                    insertMsg = MessageConstants.CWWKS1774E_AUD_INVALID;
+                }
+            } else {
+                insertMsg = MessageConstants.CWWKS1774E_AUD_INVALID;
+            }
+            //expectations = validationTools.addMessageExpectation(genericTestServer, expectations, Constants.INVOKE_RS_PROTECTED_RESOURCE, Constants.MESSAGES_LOG, Constants.STRING_CONTAINS, "Did not get message in RS logs saying the OIDC client failed to validate the token.", MessageConstants.CWWKS1737E_JWT_VALIDATION_FAILURE + ".*" + insertMsg);
+            //            expectations = validationTools.addMessageExpectation(genericTestServer, expectations, Constants.INVOKE_RS_PROTECTED_RESOURCE, Constants.MESSAGES_LOG, Constants.STRING_CONTAINS, "Did not get message in RS logs saying the OIDC client failed to validate the token.", MessageConstants.CWWKS1737E_JWT_VALIDATION_FAILURE + ".*" + MessageConstants.CWWKS1773E_TOKEN_EXPIRED);
+        }
+
+        helpers.invokeRsProtectedResource(_testName, new WebConversation(), expiredToken, updatedTestSettings, expectations);
+    }
+
+    /**
+     * inboundPropagation: "supported"
+     * Submit protected resource request with expired propagation token
+     * allowJwtAccessTokenRemoteValidation=true included in the config
+     * Expected results:
+     * - Accessing resource with expired token should fail
+     * - Request should fall back to pure OAuth/OIDC flow
+     * - Request should fail the same as if inboundPropagation="none" were specified
+     *
+     * @throws Exception
+     */
+    @AllowedFFDC({ "com.ibm.oauth.core.api.error.oauth20.OAuth20InvalidRedirectUriException", "java.lang.IllegalStateException" })
+    @Test
+    public void InboundPropagation2ServerTests_inboundPropagation_required_expiredPropagationToken_allowJwtAccessTokenRemoteValidation_true() throws Exception {
+
+        TestSettings updatedTestSettings = rsTools.updateRSProtectedResource(testSettings, "helloworld_allowJwtAccessTokenRemoteValidation_inboundPropRequired");
+
+        // Choose which expired token to use based on the selected token type
+        String expiredToken = oldAccessToken;
+        String tokenType = updatedTestSettings.getRsTokenType();
+        if (Constants.JWT_TOKEN.equals(tokenType)) {
+            String validKid = jwtUtils.getValidJwksKid(testSettings);
+            expiredToken = jwtUtils.buildOldJwtString(updatedTestSettings, validKid);
+        }
+
+        // Expired token should not allow access, so should fall back to pure OAuth/OIDC as if inboundPropagation was set to "none"
+        List<validationData> expectations = validationTools.add401Responses(Constants.INVOKE_RS_PROTECTED_RESOURCE);
+        //        expectations = validationTools.addMessageExpectation(genericTestServer, expectations, Constants.INVOKE_RS_PROTECTED_RESOURCE,
+        //                Constants.MESSAGES_LOG, Constants.STRING_CONTAINS,
+        //                "Did not get message in RS logs saying token validation failed.", MessageConstants.CWWKS1740W_RS_REDIRECT_TO_RP);
+
+        if (Constants.ACCESS_TOKEN_KEY.equals(tokenType)) {
+            expectations = validationTools.addMessageExpectation(genericTestServer, expectations, Constants.INVOKE_RS_PROTECTED_RESOURCE,
+                    Constants.MESSAGES_LOG, Constants.STRING_CONTAINS,
+                    "Did not get message in RS logs saying token validation failed.", MessageConstants.CWWKS1720E_ACCESS_TOKEN_NOT_ACTIVE);
+        } else {
+            expectations = validationTools.addMessageExpectation(testOPServer, expectations, Constants.INVOKE_RS_PROTECTED_RESOURCE, Constants.MESSAGES_LOG, Constants.STRING_CONTAINS, "Did not get message in OP logs saying that the request was not recognized.", MessageConstants.CWOAU0039W_OAUTH20_FILTER_REQUEST_NULL);
+            expectations = validationTools.addMessageExpectation(genericTestServer, expectations, Constants.INVOKE_RS_PROTECTED_RESOURCE, Constants.MESSAGES_LOG, Constants.STRING_CONTAINS, "Did not get message in RS logs saying the OIDC client failed to validate the token.", MessageConstants.CWWKS1773E_TOKEN_EXPIRED);
+            expectations = validationTools.addMessageExpectation(genericTestServer, expectations, Constants.INVOKE_RS_PROTECTED_RESOURCE, Constants.MESSAGES_LOG, Constants.STRING_MATCHES, "Did not get message in RS logs saying the OIDC client failed to validate the token.", MessageConstants.CWWKS1737E_JWT_VALIDATION_FAILURE + ".*" + MessageConstants.CWWKS1773E_TOKEN_EXPIRED);
+        }
+
+        String validationType = genericTestServer.getRSValidationType();
+        // Errors when accessing protected resource because propagation token is expired
+        if (Constants.USERINFO_ENDPOINT.equals(validationType)) {
+            expectations = validationTools.addMessageExpectation(testOPServer, expectations, Constants.INVOKE_RS_PROTECTED_RESOURCE, Constants.MESSAGES_LOG, Constants.STRING_CONTAINS, "Did not get message in OP logs saying access token was not recognized.", MessageConstants.CWWKS1617E_USERINFO_REQUEST_BAD_TOKEN);
+            expectations = validationTools.addMessageExpectation(genericTestServer, expectations, Constants.INVOKE_RS_PROTECTED_RESOURCE, Constants.MESSAGES_LOG, Constants.STRING_CONTAINS, "Did not get message in RS logs saying access token was not recognized.", MessageConstants.CWWKS1721E_OIDC_REQ_FAILED_ACCESS_TOKEN_NOT_VALID);
+        } else if (Constants.INTROSPECTION_ENDPOINT.equals(validationType)) {
+            expectations = validationTools.addMessageExpectation(testOPServer, expectations, Constants.INVOKE_RS_PROTECTED_RESOURCE, Constants.MESSAGES_LOG, Constants.STRING_CONTAINS, "Did not get message in OP logs saying access token was not valid.", MessageConstants.CWWKS1454E_ACCESS_TOKEN_NOT_VALID);
+        } else {
+            // Local validation - will see errors in the RS logs
+            String insertMsg = MessageConstants.CWWKS1739E_JWT_KEY_NOT_FOUND;
+            if (Constants.X509_CERT.equals(updatedTestSettings.getRsCertType())) {
+                if (testOPServer.getHttpDefaultSecurePort() != oldJWTTokenIssuerPort) {
+                    // The hard-coded old JWT has an issuer with port 8947, which typically should match the port we're using. However sometimes we don't get that port,
+                    // in which case the error message we'll see is one saying the issuer in the token doesn't match one of the trusted issuers.
+                    insertMsg = MessageConstants.CWWKS1781E_TOKEN_ISSUER_NOT_TRUSTED;
+                } else {
+                    insertMsg = MessageConstants.CWWKS1774E_AUD_INVALID;
+                }
+            } else {
+                insertMsg = MessageConstants.CWWKS1774E_AUD_INVALID;
+            }
+            //expectations = validationTools.addMessageExpectation(genericTestServer, expectations, Constants.INVOKE_RS_PROTECTED_RESOURCE, Constants.MESSAGES_LOG, Constants.STRING_CONTAINS, "Did not get message in RS logs saying the OIDC client failed to validate the token.", MessageConstants.CWWKS1737E_JWT_VALIDATION_FAILURE + ".*" + insertMsg);
+            expectations = validationTools.addMessageExpectation(genericTestServer, expectations, Constants.INVOKE_RS_PROTECTED_RESOURCE, Constants.MESSAGES_LOG, Constants.STRING_CONTAINS, "Did not get message in RS logs saying the OIDC client failed to validate the token.", MessageConstants.CWWKS1737E_JWT_VALIDATION_FAILURE + ".*" + MessageConstants.CWWKS1773E_TOKEN_EXPIRED);
+            expectations = validationTools.addMessageExpectation(genericTestServer, expectations, Constants.INVOKE_RS_PROTECTED_RESOURCE, Constants.MESSAGES_LOG, Constants.STRING_CONTAINS, "Did not get message in RS logs saying access token was not recognized.", MessageConstants.CWWKS1721E_OIDC_REQ_FAILED_ACCESS_TOKEN_NOT_VALID);
+        }
+
+        helpers.invokeRsProtectedResource(_testName, new WebConversation(), expiredToken, updatedTestSettings, expectations);
+    }
+
+    /**
      * inboundPropagation: "supported"
      * Expected results:
      * - Successfully reached the RS-protected resource
@@ -312,6 +509,30 @@ public class InboundPropagation2ServerTests extends CommonTest {
     public void InboundPropagation2ServerTests_inboundPropagation_supported() throws Exception {
 
         TestSettings updatedTestSettings = rsTools.updateRSProtectedResource(testSettings, "helloworld_inboundPropSupported");
+
+        List<validationData> expectations = commonTools.getValidHelloWorldExpectations(updatedTestSettings);
+
+        String validationType = genericTestServer.getRSValidationType();
+        if (validationType.equals(Constants.USERINFO_ENDPOINT)) {
+            // userinfo endpoint does not include a realm
+            expectations = commonTools.getValidHelloWorldExpectations(updatedTestSettings, REALM_FROM_ISS);
+        }
+
+        helpers.invokeRsProtectedResource(_testName, new WebConversation(), commonPropagationToken, updatedTestSettings, expectations);
+    }
+
+    /**
+     * inboundPropagation: "supported"
+     * allowJwtAccessTokenRemoteValidation=true included in the config
+     * Expected results:
+     * - Successfully reached the RS-protected resource
+     *
+     * @throws Exception
+     */
+    @Test
+    public void InboundPropagation2ServerTests_inboundPropagation_supported_allowJwtAccessTokenRemoteValidation_true() throws Exception {
+
+        TestSettings updatedTestSettings = rsTools.updateRSProtectedResource(testSettings, "helloworld_allowJwtAccessTokenRemoteValidation_inboundPropSupported");
 
         List<validationData> expectations = commonTools.getValidHelloWorldExpectations(updatedTestSettings);
 
@@ -338,6 +559,29 @@ public class InboundPropagation2ServerTests extends CommonTest {
     public void InboundPropagation2ServerTests_inboundPropagation_supported_missingPropagationToken() throws Exception {
 
         TestSettings updatedTestSettings = rsTools.updateRSProtectedResource(testSettings, "helloworld_inboundPropSupported");
+        updatedTestSettings.setWhere(null);
+
+        List<validationData> expectations = getInboundNoneExpectations();
+        // iss 3710 //expectations = validationTools.addMessageExpectation(genericTestServer, expectations, Constants.INVOKE_RS_PROTECTED_RESOURCE, Constants.MESSAGES_LOG, Constants.STRING_CONTAINS, "Did not get message in RS logs saying token validation failed.", MessageConstants.CWWKS1740W_RS_REDIRECT_TO_RP);
+
+        helpers.invokeRsProtectedResource(_testName, new WebConversation(), commonPropagationToken, updatedTestSettings, expectations);
+    }
+
+    /**
+     * inboundPropagation: "supported"
+     * RS-protected resource invocation does not include propagation token
+     * allowJwtAccessTokenRemoteValidation=true included in the config
+     * Expected results:
+     * - Same results as if inboundPropagation="none" or wasn't specified
+     *
+     * @throws Exception
+     */
+    @Mode(TestMode.LITE)
+    @AllowedFFDC("com.ibm.oauth.core.api.error.oauth20.OAuth20InvalidRedirectUriException")
+    @Test
+    public void InboundPropagation2ServerTests_inboundPropagation_supported_missingPropagationToken_allowJwtAccessTokenRemoteValidation_true() throws Exception {
+
+        TestSettings updatedTestSettings = rsTools.updateRSProtectedResource(testSettings, "helloworld_allowJwtAccessTokenRemoteValidation_inboundPropSupported");
         updatedTestSettings.setWhere(null);
 
         List<validationData> expectations = getInboundNoneExpectations();
@@ -380,6 +624,74 @@ public class InboundPropagation2ServerTests extends CommonTest {
             expectations = validationTools.addMessageExpectation(genericTestServer, expectations, Constants.INVOKE_RS_PROTECTED_RESOURCE,
                     Constants.MESSAGES_LOG, Constants.STRING_CONTAINS,
                     "Did not get message in RS logs saying token validation failed.", MessageConstants.CWWKS1720E_ACCESS_TOKEN_NOT_ACTIVE);
+        }
+
+        String validationType = genericTestServer.getRSValidationType();
+        // Errors when accessing protected resource because propagation token is expired
+        if (Constants.USERINFO_ENDPOINT.equals(validationType)) {
+            expectations = validationTools.addMessageExpectation(testOPServer, expectations, Constants.INVOKE_RS_PROTECTED_RESOURCE, Constants.MESSAGES_LOG, Constants.STRING_CONTAINS, "Did not get message in OP logs saying access token was not recognized.", MessageConstants.CWWKS1617E_USERINFO_REQUEST_BAD_TOKEN);
+        } else if (Constants.INTROSPECTION_ENDPOINT.equals(validationType)) {
+            expectations = validationTools.addMessageExpectation(testOPServer, expectations, Constants.INVOKE_RS_PROTECTED_RESOURCE, Constants.MESSAGES_LOG, Constants.STRING_CONTAINS, "Did not get message in OP logs saying access token was not valid.", MessageConstants.CWWKS1454E_ACCESS_TOKEN_NOT_VALID);
+        } else {
+            // Local validation - will see errors in the RS logs
+            String insertMsg = MessageConstants.CWWKS1739E_JWT_KEY_NOT_FOUND;
+            if (Constants.X509_CERT.equals(updatedTestSettings.getRsCertType())) {
+                if (testOPServer.getHttpDefaultSecurePort() != oldJWTTokenIssuerPort) {
+                    // The hard-coded old JWT has an issuer with port 8947, which typically should match the port we're using. However sometimes we don't get that port,
+                    // in which case the error message we'll see is one saying the issuer in the token doesn't match one of the trusted issuers.
+                    insertMsg = MessageConstants.CWWKS1781E_TOKEN_ISSUER_NOT_TRUSTED;
+                } else {
+                    insertMsg = MessageConstants.CWWKS1774E_AUD_INVALID;
+                }
+            } else {
+                insertMsg = MessageConstants.CWWKS1774E_AUD_INVALID;
+            }
+            //expectations = validationTools.addMessageExpectation(genericTestServer, expectations, Constants.INVOKE_RS_PROTECTED_RESOURCE, Constants.MESSAGES_LOG, Constants.STRING_CONTAINS, "Did not get message in RS logs saying the OIDC client failed to validate the token.", MessageConstants.CWWKS1737E_JWT_VALIDATION_FAILURE + ".*" + insertMsg);
+            expectations = validationTools.addMessageExpectation(genericTestServer, expectations, Constants.INVOKE_RS_PROTECTED_RESOURCE, Constants.MESSAGES_LOG, Constants.STRING_CONTAINS, "Did not get message in RS logs saying the OIDC client failed to validate the token.", MessageConstants.CWWKS1737E_JWT_VALIDATION_FAILURE + ".*" + MessageConstants.CWWKS1773E_TOKEN_EXPIRED);
+        }
+
+        helpers.invokeRsProtectedResource(_testName, new WebConversation(), expiredToken, updatedTestSettings, expectations);
+    }
+
+    /**
+     * inboundPropagation: "supported"
+     * Submit protected resource request with expired propagation token
+     * allowJwtAccessTokenRemoteValidation=true included in the config
+     * Expected results:
+     * - Accessing resource with expired token should fail
+     * - Request should fall back to pure OAuth/OIDC flow
+     * - Request should fail the same as if inboundPropagation="none" were specified
+     *
+     * @throws Exception
+     */
+    @AllowedFFDC({ "com.ibm.oauth.core.api.error.oauth20.OAuth20InvalidRedirectUriException", "java.lang.IllegalStateException" })
+    @Test
+    public void InboundPropagation2ServerTests_inboundPropagation_supported_expiredPropagationToken_allowJwtAccessTokenRemoteValidation_true() throws Exception {
+
+        TestSettings updatedTestSettings = rsTools.updateRSProtectedResource(testSettings, "helloworld_allowJwtAccessTokenRemoteValidation_inboundPropSupported");
+
+        // Choose which expired token to use based on the selected token type
+        String expiredToken = oldAccessToken;
+        String tokenType = updatedTestSettings.getRsTokenType();
+        if (Constants.JWT_TOKEN.equals(tokenType)) {
+            String validKid = jwtUtils.getValidJwksKid(testSettings);
+            expiredToken = jwtUtils.buildOldJwtString(updatedTestSettings, validKid);
+        }
+
+        // Expired token should not allow access, so should fall back to pure OAuth/OIDC as if inboundPropagation was set to "none"
+        List<validationData> expectations = getInboundNoneExpectations();
+        expectations = validationTools.addMessageExpectation(genericTestServer, expectations, Constants.INVOKE_RS_PROTECTED_RESOURCE,
+                Constants.MESSAGES_LOG, Constants.STRING_CONTAINS,
+                "Did not get message in RS logs saying token validation failed.", MessageConstants.CWWKS1740W_RS_REDIRECT_TO_RP);
+
+        if (Constants.ACCESS_TOKEN_KEY.equals(tokenType)) {
+            expectations = validationTools.addMessageExpectation(genericTestServer, expectations, Constants.INVOKE_RS_PROTECTED_RESOURCE,
+                    Constants.MESSAGES_LOG, Constants.STRING_CONTAINS,
+                    "Did not get message in RS logs saying token validation failed.", MessageConstants.CWWKS1720E_ACCESS_TOKEN_NOT_ACTIVE);
+        } else {
+            expectations = validationTools.addMessageExpectation(testOPServer, expectations, Constants.INVOKE_RS_PROTECTED_RESOURCE,
+                    Constants.MESSAGES_LOG, Constants.STRING_CONTAINS,
+                    "Did not get message in OP logs saying that the request was not recognized.", MessageConstants.CWOAU0039W_OAUTH20_FILTER_REQUEST_NULL);
         }
 
         String validationType = genericTestServer.getRSValidationType();
